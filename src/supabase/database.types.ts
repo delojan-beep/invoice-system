@@ -340,6 +340,9 @@ isOneToOne: false
 "reject_invoice":
 { Args: { "p_comment": string,"p_invoice": string }; Returns: undefined
                            },
+"set_invoice_reference":
+{ Args: { "p_invoice": string,"p_reference": string }; Returns: undefined
+                           },
 "submit_invoice":
 { Args: { "p_confirmed": boolean,"p_invoice": string }; Returns: string
                            },

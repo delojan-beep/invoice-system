@@ -132,11 +132,11 @@ select is((select count(*) from public.profiles), 1::bigint, 'the CEO without tw
 reset role;
 
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000c1', 'aal2');
-select is((select count(*) from public.invoices), 3::bigint, 'the CEO with two-factor sees every invoice');
+select is((select count(*) from public.invoices where id::text like '10000000-%'), 3::bigint, 'the CEO with two-factor sees every invoice');
 reset role;
 
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000a1', 'aal2');
-select is((select count(*) from public.invoices), 3::bigint, 'accounts with two-factor sees every invoice');
+select is((select count(*) from public.invoices where id::text like '10000000-%'), 3::bigint, 'accounts with two-factor sees every invoice');
 select is((select count(*) from public.user_roles), 1::bigint, 'accounts sees only their own roles');
 reset role;
 
