@@ -38,6 +38,7 @@ Approver, accounts and admin must set up an authenticator app on first sign-in.
 | --- | --- |
 | `pnpm dev` | Runs the app locally |
 | `pnpm test` | Unit tests |
+| `pnpm test:db` | Database access-rule tests (needs `pnpm db:start`) |
 | `pnpm lint` / `pnpm typecheck` | Static checks |
 | `pnpm build` | Production build |
 | `pnpm db:reset` | Rebuilds the local database from migrations and seeds |

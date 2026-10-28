@@ -31,10 +31,12 @@ export const getViewer = cache(async (): Promise<Viewer> => {
   const claims = claimsData?.claims;
   if (!claims?.sub) return SIGNED_OUT;
 
-  const [{ data: profile }, { data: roleRows }, { data: aalData }] = await Promise.all([
+  // listFactors checks the user with the Auth server; reading the AAL from the
+  // cookie session instead would trust unverified data.
+  const [{ data: profile }, { data: roleRows }, { data: factors }] = await Promise.all([
     supabase.from("profiles").select("name, email, status, timezone").eq("id", claims.sub).maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", claims.sub),
-    supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+    supabase.auth.mfa.listFactors(),
   ]);
 
   const roles = (roleRows ?? [])
@@ -46,7 +48,7 @@ export const getViewer = cache(async (): Promise<Viewer> => {
     active: profile?.status === "active",
     roles,
     aal: claims.aal === "aal2" ? "aal2" : "aal1",
-    hasVerifiedFactor: aalData?.nextLevel === "aal2",
+    hasVerifiedFactor: (factors?.totp.length ?? 0) > 0,
     id: claims.sub,
     email: profile?.email ?? claims.email ?? "",
     name: profile?.name ?? "",

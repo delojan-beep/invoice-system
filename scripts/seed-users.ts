@@ -48,6 +48,10 @@ async function main() {
       password: PASSWORD,
       email_confirm: true,
     });
+    if (error?.code === "email_exists") {
+      console.log(`  ${user.email.padEnd(26)} already exists, skipped`);
+      continue;
+    }
     if (error) throw new Error(`${user.email}: ${error.message}`);
 
     const id = data.user.id;
