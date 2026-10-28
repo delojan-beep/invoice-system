@@ -33,13 +33,16 @@ insert into public.user_roles (user_id, role) values
   ('00000000-0000-0000-0000-0000000000d1', 'admin');
 
 insert into public.invoices (id, number, employee_id, month, currency_code, status) values
-  ('10000000-0000-0000-0000-000000000001', 'QN-T001-2026-10-001', '00000000-0000-0000-0000-0000000000e1', '2026-10-01', 'LKR', 'submitted'),
+  ('10000000-0000-0000-0000-000000000001', 'QN-T001-2026-10-001', '00000000-0000-0000-0000-0000000000e1', '2026-10-01', 'LKR', 'draft'),
   ('10000000-0000-0000-0000-000000000002', null, '00000000-0000-0000-0000-0000000000e2', '2026-10-01', 'CAD', 'draft'),
   ('10000000-0000-0000-0000-000000000003', null, '00000000-0000-0000-0000-0000000000e3', '2026-10-01', 'LKR', 'draft');
 
 insert into public.line_items (invoice_id, line_type_id, description, rate_minor)
 select '10000000-0000-0000-0000-000000000001', id, 'October fees', 25000000
 from public.line_types where name = 'Professional fees';
+
+-- Lines can only be added while editable, so submit after adding.
+update public.invoices set status = 'submitted' where id = '10000000-0000-0000-0000-000000000001';
 
 insert into public.approval_events (id, invoice_id, actor_id, action, new_status) values
   ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001',
