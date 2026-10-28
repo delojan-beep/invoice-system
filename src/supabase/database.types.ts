@@ -197,17 +197,23 @@ isOneToOne: false
                   ]
                 },"payments": {
                   Row: {
-                    "actual_exchange_rate": number | null,"amount_received_minor": number | null,"amount_sent_minor": number | null,"confirmed_by_accounts_at": string | null,"created_at": string,"fee_paid_by": Database["public"]['Enums']["wise_fee_payer"] | null,"id": string,"invoice_id": string,"paid_at": string,"received_currency": string | null,"recorded_by": string,"sent_currency": string | null,"wise_fee_minor": number | null,"wise_transfer_id": string | null
+                    "actual_exchange_rate": number | null,"amount_received_minor": number | null,"amount_sent_minor": number | null,"confirmed_by": string | null,"confirmed_by_accounts_at": string | null,"created_at": string,"fee_paid_by": Database["public"]['Enums']["wise_fee_payer"] | null,"id": string,"invoice_id": string,"paid_at": string,"received_currency": string | null,"recorded_by": string,"sent_currency": string | null,"wise_fee_minor": number | null,"wise_transfer_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "actual_exchange_rate"?: number | null,"amount_received_minor"?: number | null,"amount_sent_minor"?: number | null,"confirmed_by_accounts_at"?: string | null,"created_at"?: string,"fee_paid_by"?: Database["public"]['Enums']["wise_fee_payer"] | null,"id"?: string,"invoice_id": string,"paid_at"?: string,"received_currency"?: string | null,"recorded_by": string,"sent_currency"?: string | null,"wise_fee_minor"?: number | null,"wise_transfer_id"?: string | null
+                    "actual_exchange_rate"?: number | null,"amount_received_minor"?: number | null,"amount_sent_minor"?: number | null,"confirmed_by"?: string | null,"confirmed_by_accounts_at"?: string | null,"created_at"?: string,"fee_paid_by"?: Database["public"]['Enums']["wise_fee_payer"] | null,"id"?: string,"invoice_id": string,"paid_at"?: string,"received_currency"?: string | null,"recorded_by": string,"sent_currency"?: string | null,"wise_fee_minor"?: number | null,"wise_transfer_id"?: string | null
                   }
                   Update: {
-                    "actual_exchange_rate"?: number | null,"amount_received_minor"?: number | null,"amount_sent_minor"?: number | null,"confirmed_by_accounts_at"?: string | null,"created_at"?: string,"fee_paid_by"?: Database["public"]['Enums']["wise_fee_payer"] | null,"id"?: string,"invoice_id"?: string,"paid_at"?: string,"received_currency"?: string | null,"recorded_by"?: string,"sent_currency"?: string | null,"wise_fee_minor"?: number | null,"wise_transfer_id"?: string | null
+                    "actual_exchange_rate"?: number | null,"amount_received_minor"?: number | null,"amount_sent_minor"?: number | null,"confirmed_by"?: string | null,"confirmed_by_accounts_at"?: string | null,"created_at"?: string,"fee_paid_by"?: Database["public"]['Enums']["wise_fee_payer"] | null,"id"?: string,"invoice_id"?: string,"paid_at"?: string,"received_currency"?: string | null,"recorded_by"?: string,"sent_currency"?: string | null,"wise_fee_minor"?: number | null,"wise_transfer_id"?: string | null
                   }
                   Relationships: [
                     {
+      foreignKeyName: "payments_confirmed_by_fkey"
+      columns: ["confirmed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "payments_invoice_id_fkey"
       columns: ["invoice_id"]
 isOneToOne: false
@@ -315,6 +321,9 @@ isOneToOne: false
           Functions: {
             "approve_invoices":
 { Args: { "p_invoices": (string)[] }; Returns: number
+                           },
+"confirm_payment":
+{ Args: { "p_actual_rate": number,"p_amount_received_minor": number,"p_amount_sent_minor": number,"p_fee_paid_by": Database["public"]['Enums']["wise_fee_payer"],"p_invoice": string,"p_received_currency": string,"p_sent_currency": string,"p_wise_fee_minor": number,"p_wise_transfer_id": string }; Returns: undefined
                            },
 "ensure_monthly_draft":
 { Args: { "p_employee"?: string,"p_month"?: string }; Returns: string

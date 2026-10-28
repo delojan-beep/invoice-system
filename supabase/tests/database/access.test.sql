@@ -2,7 +2,7 @@
 -- Each test acts as a user by setting the JWT claims Supabase would send.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(22);
+select plan(23);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures (as the database owner)
@@ -103,6 +103,7 @@ select results_eq(
 select is((select count(*) from public.line_items), 1::bigint, 'an employee sees the lines of their own invoice');
 select is((select count(*) from public.profiles), 1::bigint, 'an employee sees only their own profile');
 select is((select count(*) from public.currencies), 2::bigint, 'an employee can read reference data');
+select is((select count(*) from public.user_roles), 1::bigint, 'an employee sees only their own roles');
 select throws_ok(
   $$ insert into public.user_roles (user_id, role) values ('00000000-0000-0000-0000-0000000000e1', 'admin') $$,
   '42501', null, 'an employee cannot give themselves a role'
@@ -137,7 +138,7 @@ reset role;
 
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000a1', 'aal2');
 select is((select count(*) from public.invoices where id::text like '10000000-%'), 3::bigint, 'accounts with two-factor sees every invoice');
-select is((select count(*) from public.user_roles), 1::bigint, 'accounts sees only their own roles');
+select is((select count(*) from public.user_roles where user_id::text like '00000000-%'), 6::bigint, 'accounts with two-factor sees everyone''s roles (to list employees)');
 reset role;
 
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000d1', 'aal1');

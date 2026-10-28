@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
+import { useFormAction } from "@/src/ui/use-form-action";
 import type { CurrencyInfo } from "@/src/domain/money";
 import { Btn, Input, Label, Message, Select } from "@/src/ui/controls";
 import type { FormState } from "./actions";
@@ -21,9 +22,9 @@ export function DetailsForm({
   currencies: CurrencyInfo[];
   reference: string;
 }) {
-  const [state, run, pending] = useActionState(action, {});
+  const [state, run, pending] = useFormAction(action, {});
   return (
-    <form action={run} className="flex flex-col gap-3">
+    <form onSubmit={run} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
         {editable && (
           <Label text="Currency" hint="Changing it removes tax rates set for the old currency">
@@ -60,12 +61,12 @@ export function SubmitForm({
   blockers: string[];
   resubmit: boolean;
 }) {
-  const [state, run, pending] = useActionState(action, {});
+  const [state, run, pending] = useFormAction(action, {});
   const [confirmed, setConfirmed] = useState(false);
   const blocked = blockers.length > 0;
 
   return (
-    <form action={run} className="flex flex-col gap-3">
+    <form onSubmit={run} className="flex flex-col gap-3">
       {blocked && (
         <ul className="list-disc pl-5 text-sm text-amber-800">
           {blockers.map((b) => (
@@ -103,9 +104,9 @@ export function MarkPaidForm({
   currency: CurrencyInfo;
   currencies: CurrencyInfo[];
 }) {
-  const [state, run, pending] = useActionState(action, {});
+  const [state, run, pending] = useFormAction(action, {});
   return (
-    <form action={run} className="flex flex-col gap-3">
+    <form onSubmit={run} className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3 sm:max-w-md">
         <Label text="Amount received" hint="Optional">
           <Input name="amount" inputMode="decimal" placeholder="0.00" />

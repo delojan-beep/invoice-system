@@ -16,6 +16,7 @@ export const ACTION_LABELS: Record<string, string> = {
   approve: "Approved",
   reject: "Rejected",
   mark_paid: "Marked paid",
+  payment_confirm: "Payment confirmed against Wise",
 };
 
 /** Who did it, from the invoice owner's point of view. */
