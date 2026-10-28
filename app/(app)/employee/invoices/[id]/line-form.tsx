@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useFormAction } from "@/src/ui/use-form-action";
 import { lineAmounts } from "@/src/domain/invoice";
 import { formatMoney, parseAmount, type CurrencyInfo } from "@/src/domain/money";
 import { Btn, Input, Label, Message, Select } from "@/src/ui/controls";
@@ -38,7 +39,7 @@ export function LineForm({
   const [values, setValues] = useState<LineFormValues>(initial ?? EMPTY);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const [state, run, pending] = useActionState(async (prev: FormState, formData: FormData) => {
+  const [state, run, pending] = useFormAction(async (prev: FormState, formData: FormData) => {
     const result = await action(prev, formData);
     if (!result.error) {
       if (!initial) setValues(EMPTY);
@@ -59,7 +60,7 @@ export function LineForm({
   const needsReceipt = lineTypes.find((t) => t.id === values.lineTypeId)?.receipt_required;
 
   return (
-    <form ref={formRef} action={run} className="flex flex-col gap-3">
+    <form ref={formRef} onSubmit={run} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
         <Label text="Type" hint={needsReceipt ? "Needs a receipt before you submit" : undefined}>
           <Select name="lineTypeId" value={values.lineTypeId} onChange={set("lineTypeId")} required>

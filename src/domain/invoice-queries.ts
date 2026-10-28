@@ -23,12 +23,14 @@ export async function getInvoice(invoiceId: string) {
     .from("invoices")
     .select(
       `*, ${CURRENCY},
+       employee:profiles!invoices_employee_id_fkey(name, employee_code),
        lines:line_items(*,
          line_type:line_types(id, name, receipt_required),
          tax_rate:tax_rates(id, name, percentage, label),
          attachments(id, file_name, mime_type, size_bytes, created_at)),
-       events:approval_events(id, action, actor_id, previous_status, new_status, comment, system_note, created_at),
-       payments(id, amount_received_minor, received_currency, paid_at, recorded_by)`,
+       events:approval_events(id, action, actor_id, previous_status, new_status, comment, system_note, created_at,
+         actor:profiles!approval_events_actor_id_fkey(name)),
+       payments(*)`,
     )
     .eq("id", invoiceId)
     .order("position", { referencedTable: "line_items" })

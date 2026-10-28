@@ -7,9 +7,8 @@ import { createClient } from "@/src/supabase/server";
 // storage policies decide who may see it: the owner, and staff with two-factor.
 export async function GET(request: NextRequest, { params }: RouteContext<"/attachments/[id]">) {
   const viewer = await getViewer();
-  if (decideAccess(viewer) !== "ok") {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  // Signed out or mid-way through two-factor: "/" sends them to the right step.
+  if (decideAccess(viewer) !== "ok") return NextResponse.redirect(new URL("/", request.url));
 
   const { id } = await params;
   const supabase = await createClient();
