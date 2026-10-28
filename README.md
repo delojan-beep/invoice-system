@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QNetwork Invoice System
 
-## Getting Started
+Monthly invoicing for QNetwork: employees submit, the CEO approves, payment is recorded. See `doc/` for the PRD.
 
-First, run the development server:
+Stack: Next.js 16 on Vercel, Supabase (Postgres, Auth with two-factor, Storage), Resend for email.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Run it locally
+
+Needs Node.js 24, pnpm 9 and Docker Desktop.
+
+```sh
+pnpm install
+pnpm db:start                 # starts Supabase in Docker; prints the local keys
+cp .env.example .env.local    # paste the URL, publishable key and secret key
+pnpm db:reset                 # applies migrations, seed.sql, and creates the dev users
+pnpm dev                      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Local email (sign-in links) shows up at http://localhost:54324. Supabase Studio is at http://localhost:54323.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Dev users
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All use the password `LocalDev2026`.
 
-## Learn More
+| Email | Role |
+| --- | --- |
+| admin@qnetwork.test | Admin |
+| ceo@qnetwork.test | Approver |
+| accounts@qnetwork.test | Accounts |
+| nimal@qnetwork.test | Employee (E014, LKR) |
+| jordan@qnetwork.test | Employee (E015, CAD) |
 
-To learn more about Next.js, take a look at the following resources:
+Approver, accounts and admin must set up an authenticator app on first sign-in.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Commands
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Command | Does |
+| --- | --- |
+| `pnpm dev` | Runs the app locally |
+| `pnpm test` | Unit tests |
+| `pnpm lint` / `pnpm typecheck` | Static checks |
+| `pnpm build` | Production build |
+| `pnpm db:reset` | Rebuilds the local database from migrations and seeds |
 
-## Deploy on Vercel
+## Layout
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/              routes: (app)/employee, approver, accounts, admin; login; mfa; auth
+src/auth/         access rules (access.ts) and the per-request check (dal.ts)
+src/supabase/     Supabase clients for server code, admin tasks and proxy.ts
+src/ui/           shared components
+supabase/         config, migrations, seed.sql
+scripts/          dev user seeding
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## How access works
+
+- `proxy.ts` refreshes the session and sends signed-out visitors to `/login`.
+- Every page and action calls `requireAccess([...roles])` from `src/auth/dal.ts`.
+- Approver, accounts and admin need a two-factor (aal2) session everywhere.
+- The database enforces the same rules with row-level security: employees read only their own invoices; staff reads need aal2.
+- Inactive users are signed out on their next request.
