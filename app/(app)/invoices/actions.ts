@@ -1,6 +1,7 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 import { requireAccess } from "@/src/auth/dal";
 import {
@@ -12,6 +13,7 @@ import {
   type ActionResult,
 } from "@/src/domain/invoice-actions";
 import { parseAmount } from "@/src/domain/money";
+import { sendStatusEmails } from "@/src/email/status";
 import { createClient } from "@/src/supabase/server";
 
 // Approver and accounts actions. Each checks the role here and the database
@@ -27,6 +29,12 @@ function done<T>(result: ActionResult<T>, message?: string): FormState {
 
 const ids = z.array(z.uuid()).min(1, "Tick at least one invoice");
 
+/** Emails the employees once the response is sent; a failed email never undoes the action. */
+function emailEmployees<T>(result: ActionResult<T>, invoiceIds: string[], event: "approved" | "rejected" | "paid", comment?: string) {
+  if (result.ok) after(() => sendStatusEmails(invoiceIds, event, comment));
+  return result;
+}
+
 function plural(n: number, word: string) {
   return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
@@ -37,7 +45,7 @@ export async function approveSelected(_prev: FormState, formData: FormData): Pro
   await requireAccess(["approver"]);
   const parsed = ids.safeParse(formData.getAll("ids"));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const result = await approveInvoices(parsed.data);
+  const result = emailEmployees(await approveInvoices(parsed.data), parsed.data, "approved");
   return done(result, result.ok ? `Approved ${plural(result.data ?? 0, "invoice")}` : undefined);
 }
 
@@ -45,25 +53,26 @@ export async function markSelectedPaid(_prev: FormState, formData: FormData): Pr
   await requireAccess(["approver"]);
   const parsed = ids.safeParse(formData.getAll("ids"));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const result = await markInvoicesPaid(parsed.data);
+  const result = emailEmployees(await markInvoicesPaid(parsed.data), parsed.data, "paid");
   return done(result, result.ok ? `Marked ${plural(result.data ?? 0, "invoice")} paid` : undefined);
 }
 
 export async function approve(invoiceId: string): Promise<FormState> {
   await requireAccess(["approver"]);
-  return done(await approveInvoices([invoiceId]), "Approved");
+  return done(emailEmployees(await approveInvoices([invoiceId]), [invoiceId], "approved"), "Approved");
 }
 
 export async function reject(invoiceId: string, _prev: FormState, formData: FormData): Promise<FormState> {
   await requireAccess(["approver"]);
   const comment = String(formData.get("comment") ?? "").trim();
   if (!comment) return { error: "Say what needs fixing" };
-  return done(await rejectInvoice(invoiceId, comment.slice(0, 2000)), "Sent back to the employee");
+  const text = comment.slice(0, 2000);
+  return done(emailEmployees(await rejectInvoice(invoiceId, text), [invoiceId], "rejected", text), "Sent back to the employee");
 }
 
 export async function markPaid(invoiceId: string): Promise<FormState> {
   await requireAccess(["approver"]);
-  return done(await markInvoicesPaid([invoiceId]), "Marked paid");
+  return done(emailEmployees(await markInvoicesPaid([invoiceId]), [invoiceId], "paid"), "Marked paid");
 }
 
 /** Called once when the approver opens a submitted invoice: it can no longer be recalled. */

@@ -177,14 +177,14 @@ isOneToOne: false
                   ]
                 },"notification_logs": {
                   Row: {
-                    "error": string | null,"id": string,"invoice_id": string | null,"provider_message_id": string | null,"recipient": string,"sent_at": string,"status": string,"type": string
+                    "error": string | null,"id": string,"invoice_id": string | null,"period": string | null,"provider_message_id": string | null,"recipient": string,"sent_at": string,"status": string,"subject": string | null,"type": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "error"?: string | null,"id"?: string,"invoice_id"?: string | null,"provider_message_id"?: string | null,"recipient": string,"sent_at"?: string,"status": string,"type": string
+                    "error"?: string | null,"id"?: string,"invoice_id"?: string | null,"period"?: string | null,"provider_message_id"?: string | null,"recipient": string,"sent_at"?: string,"status": string,"subject"?: string | null,"type": string
                   }
                   Update: {
-                    "error"?: string | null,"id"?: string,"invoice_id"?: string | null,"provider_message_id"?: string | null,"recipient"?: string,"sent_at"?: string,"status"?: string,"type"?: string
+                    "error"?: string | null,"id"?: string,"invoice_id"?: string | null,"period"?: string | null,"provider_message_id"?: string | null,"recipient"?: string,"sent_at"?: string,"status"?: string,"subject"?: string | null,"type"?: string
                   }
                   Relationships: [
                     {
@@ -322,11 +322,19 @@ isOneToOne: false
             "approve_invoices":
 { Args: { "p_invoices": (string)[] }; Returns: number
                            },
+"claim_notifications":
+{ Args: { "p_invoices": (string)[],"p_periods": (string)[],"p_recipient": string,"p_type": string }; Returns: {
+              "claimed_invoice_id": string,"claimed_log_id": string
+            }[]
+                           },
 "confirm_payment":
 { Args: { "p_actual_rate": number,"p_amount_received_minor": number,"p_amount_sent_minor": number,"p_fee_paid_by": Database["public"]['Enums']["wise_fee_payer"],"p_invoice": string,"p_received_currency": string,"p_sent_currency": string,"p_wise_fee_minor": number,"p_wise_transfer_id": string }; Returns: undefined
                            },
 "ensure_monthly_draft":
 { Args: { "p_employee"?: string,"p_month"?: string }; Returns: string
+                           },
+"finish_notifications":
+{ Args: { "p_error": string,"p_log_ids": (string)[],"p_provider_message_id": string,"p_status": string,"p_subject": string }; Returns: undefined
                            },
 "has_role":
 { Args: { "required": Database["public"]['Enums']["app_role"] }; Returns: boolean
