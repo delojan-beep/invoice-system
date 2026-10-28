@@ -10,24 +10,12 @@ export type NotificationType =
   | "monthly_summary";
 
 /**
- * Sends one email and logs it, success or failure. When one email covers
- * several invoices, one log row is written per invoice so jobs can tell what
- * each invoice has already been sent.
+ * Sends one email and logs it, success or failure. Used for emails that follow
+ * a person's action (status updates), where each action sends exactly once.
  */
 export async function sendAndLog(type: NotificationType, email: Email, invoiceIds: (string | null)[] = [null]) {
   const supabase = createAdminClient();
-  let status: "sent" | "failed" = "sent";
-  let providerId: string | null = null;
-  let error: string | null = null;
-
-  try {
-    providerId = await deliver(email);
-  } catch (err) {
-    status = "failed";
-    error = err instanceof Error ? err.message : String(err);
-    console.error(`Email ${type} to ${email.to} failed:`, error);
-  }
-
+  const { providerId, error } = await tryDeliver(type, email);
   const { error: logError } = await supabase.from("notification_logs").insert(
     (invoiceIds.length ? invoiceIds : [null]).map((invoiceId) => ({
       type,
@@ -35,16 +23,67 @@ export async function sendAndLog(type: NotificationType, email: Email, invoiceId
       invoice_id: invoiceId,
       subject: email.subject,
       provider_message_id: providerId,
-      status,
+      status: error ? "failed" : "sent",
       error,
     })),
   );
   if (logError) console.error("Could not log email", logError);
-  return status;
+  return error ? "failed" : "sent";
 }
 
-/** Records that a scheduled email was due but had nothing to say (so it is not retried today). */
-export async function logSkipped(type: NotificationType, recipient: string, reason: string) {
+export type Claim = { invoiceId: string | null; period: string };
+
+/**
+ * For scheduled emails: claims each (invoice, period) in the log first, so a
+ * repeated or overlapping run never sends twice, then builds the email from
+ * only the invoices this run won. `build` returns null when there is nothing
+ * to say this period (the claim is kept as "skipped").
+ */
+export async function sendOnce(
+  type: NotificationType,
+  recipient: string,
+  claims: Claim[],
+  build: (claimedInvoiceIds: string[]) => Email | null,
+): Promise<"sent" | "failed" | "skipped" | "already sent"> {
   const supabase = createAdminClient();
-  await supabase.from("notification_logs").insert({ type, recipient, status: "skipped", error: reason });
+  const { data: won, error } = await supabase.rpc("claim_notifications", {
+    p_type: type,
+    p_recipient: recipient,
+    // Generated types say string[]; null is how an email that is not about an invoice is claimed.
+    p_invoices: claims.map((c) => c.invoiceId) as string[],
+    p_periods: claims.map((c) => c.period),
+  });
+  if (error) throw error;
+  if (!won.length) return "already sent";
+
+  const logIds = won.map((w) => w.claimed_log_id);
+  const email = build(won.map((w) => w.claimed_invoice_id).filter(Boolean));
+  const finish = (status: string, subject: string | null, providerId: string | null, err: string | null) =>
+    supabase.rpc("finish_notifications", {
+      p_log_ids: logIds,
+      p_status: status,
+      p_subject: subject as string,
+      p_provider_message_id: providerId as string,
+      p_error: err as string,
+    });
+
+  if (!email) {
+    await finish("skipped", null, null, "Nothing to send");
+    return "skipped";
+  }
+
+  const result = await tryDeliver(type, email);
+  const { error: finishError } = await finish(result.error ? "failed" : "sent", email.subject, result.providerId, result.error);
+  if (finishError) console.error("Could not log email", finishError);
+  return result.error ? "failed" : "sent";
+}
+
+async function tryDeliver(type: NotificationType, email: Email) {
+  try {
+    return { providerId: await deliver(email), error: null };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`Email ${type} to ${email.to} failed:`, message);
+    return { providerId: null, error: message };
+  }
 }

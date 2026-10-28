@@ -72,18 +72,3 @@ export function toRow(
     link: appUrl(`/invoices/${invoice.id}`),
   };
 }
-
-/** Invoices whose last email of this type was sent since they were (re)submitted. */
-export async function alreadySent(type: string, invoices: { id: string; submitted_at: string | null }[]) {
-  if (invoices.length === 0) return new Set<string>();
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("notification_logs")
-    .select("invoice_id, sent_at")
-    .eq("type", type)
-    .eq("status", "sent")
-    .in("invoice_id", invoices.map((i) => i.id));
-  if (error) throw error;
-  const since = new Map(invoices.map((i) => [i.id, i.submitted_at ?? ""]));
-  return new Set(data.filter((l) => l.invoice_id && l.sent_at >= (since.get(l.invoice_id) ?? "")).map((l) => l.invoice_id!));
-}
