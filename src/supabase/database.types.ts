@@ -177,14 +177,14 @@ isOneToOne: false
                   ]
                 },"notification_logs": {
                   Row: {
-                    "error": string | null,"id": string,"invoice_id": string | null,"provider_message_id": string | null,"recipient": string,"sent_at": string,"status": string,"type": string
+                    "error": string | null,"id": string,"invoice_id": string | null,"provider_message_id": string | null,"recipient": string,"sent_at": string,"status": string,"subject": string | null,"type": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "error"?: string | null,"id"?: string,"invoice_id"?: string | null,"provider_message_id"?: string | null,"recipient": string,"sent_at"?: string,"status": string,"type": string
+                    "error"?: string | null,"id"?: string,"invoice_id"?: string | null,"provider_message_id"?: string | null,"recipient": string,"sent_at"?: string,"status": string,"subject"?: string | null,"type": string
                   }
                   Update: {
-                    "error"?: string | null,"id"?: string,"invoice_id"?: string | null,"provider_message_id"?: string | null,"recipient"?: string,"sent_at"?: string,"status"?: string,"type"?: string
+                    "error"?: string | null,"id"?: string,"invoice_id"?: string | null,"provider_message_id"?: string | null,"recipient"?: string,"sent_at"?: string,"status"?: string,"subject"?: string | null,"type"?: string
                   }
                   Relationships: [
                     {
