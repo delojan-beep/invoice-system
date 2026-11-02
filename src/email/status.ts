@@ -1,10 +1,10 @@
 import "server-only";
 import { formatMonth } from "@/src/domain/format";
 import { formatMoney } from "@/src/domain/money";
-import { appUrl } from "@/src/jobs/data";
+import { appUrl, getSettings } from "@/src/jobs/data";
 import { createAdminClient } from "@/src/supabase/admin";
 import { sendAndLog } from "./notify";
-import { statusUpdate } from "./templates";
+import { statusUpdate, withNote } from "./templates";
 
 /**
  * Tells each employee their invoice was approved, rejected, or marked paid by
@@ -23,9 +23,10 @@ export async function sendStatusEmails(invoiceIds: string[], event: "approved" |
     return;
   }
 
+  const wording = ((await getSettings()).email_wording ?? {}) as Record<string, unknown>;
   for (const invoice of data) {
     if (!invoice.employee) continue;
-    const email = statusUpdate({
+    const email = withNote(statusUpdate({
       employeeName: invoice.employee.name,
       month: formatMonth(invoice.month),
       number: invoice.number ?? "",
@@ -33,7 +34,7 @@ export async function sendStatusEmails(invoiceIds: string[], event: "approved" |
       event,
       comment,
       link: appUrl(`/employee/invoices/${invoice.id}`),
-    });
+    }), wording.status_update);
     await sendAndLog("status_update", { to: invoice.employee.email, ...email }, [invoice.id]);
   }
 }

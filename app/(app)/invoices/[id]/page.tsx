@@ -60,7 +60,10 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
           </h1>
           <StatusBadge status={invoice.status} overdue={isOverdue(invoice)} />
         </div>
-        <p className="mt-1 font-mono text-sm text-zinc-600">{invoice.number}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+          <p className="font-mono text-sm text-zinc-600">{invoice.number}</p>
+          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="text-sm font-medium text-blue-700 hover:underline">Download PDF</a>
+        </div>
         <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-zinc-600">
           {invoice.submitted_at && <div>Submitted {formatDate(invoice.submitted_at, tz)}</div>}
           {invoice.status === "submitted" && invoice.review_deadline && (

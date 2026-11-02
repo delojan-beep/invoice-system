@@ -1,8 +1,9 @@
 import type { ComponentProps, ReactNode } from "react";
+import { Btn, Input } from "./controls";
 
 export function AuthCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 py-8 text-zinc-900">
       <div className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
         <h1 className="mb-6 text-xl font-semibold text-zinc-900">{title}</h1>
         <div className="flex flex-col gap-4">{children}</div>
@@ -15,21 +16,13 @@ export function Field({ label, ...input }: { label: string } & ComponentProps<"i
   return (
     <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
       {label}
-      <input
-        {...input}
-        className="rounded-md border border-zinc-300 px-3 py-2 text-base font-normal text-zinc-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20"
-      />
+      <Input {...input} className="font-normal" />
     </label>
   );
 }
 
 export function Button(props: ComponentProps<"button">) {
-  return (
-    <button
-      {...props}
-      className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 disabled:opacity-50"
-    />
-  );
+  return <Btn {...props} />;
 }
 
 export function Notice({ tone, children }: { tone: "error" | "info"; children: ReactNode }) {

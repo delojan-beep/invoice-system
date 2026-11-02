@@ -1,0 +1,90 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { requireAccess } from "@/src/auth/dal";
+import { getReferenceLists, getUser, timezones } from "@/src/domain/admin-queries";
+import { ActionButton } from "@/src/ui/action-button";
+import { Card } from "@/src/ui/controls";
+import { setUserStatus, updateUser } from "../../actions";
+import { UserForm } from "../user-form";
+
+// Waits for the access check on the server before rendering (see Cache Components docs).
+export const instant = false;
+
+export default async function UserPage({ params, searchParams }: PageProps<"/admin/users/[id]">) {
+  const viewer = await requireAccess(["admin"]);
+  const { id } = await params;
+  const { created } = await searchParams;
+  const [user, lists] = await Promise.all([getUser(id), getReferenceLists()]);
+  if (!user) notFound();
+
+  const currencies = lists.currencies.filter((c) => c.active || c.code === user.default_currency).map((c) => c.code);
+  const isSelf = user.id === viewer.id;
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <Link href="/admin/users" className="text-sm text-blue-700 hover:underline">
+          ← Users
+        </Link>
+        <h1 className="mt-2 text-2xl font-semibold text-zinc-900">{user.name}</h1>
+        {created && (
+          <p role="status" className="mt-2 text-sm text-green-700">
+            Added. They can sign in with an email link sent to {user.email}.
+          </p>
+        )}
+      </div>
+
+      <Card title="Details">
+        <UserForm
+          action={updateUser.bind(null, user.id)}
+          currencies={currencies}
+          timezones={timezones()}
+          submitLabel="Save"
+          initial={{
+            name: user.name,
+            email: user.email,
+            roles: user.roles,
+            employeeCode: user.employee_code ?? "",
+            defaultCurrency: user.default_currency ?? "",
+            timezone: user.timezone,
+            address: user.address ?? "",
+            nicOrTin: user.nic_or_tin ?? "",
+            wiseRef: user.wise_recipient_ref ?? "",
+          }}
+        />
+      </Card>
+
+      <Card title="Status">
+        {user.status === "active" ? (
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-zinc-600">
+              Active. Making someone inactive stops them signing in and stops new monthly drafts. Their past invoices stay,
+              and an invoice they already submitted can still be approved and paid.
+            </p>
+            {isSelf ? (
+              <p className="text-sm text-zinc-500">You can&apos;t make yourself inactive.</p>
+            ) : (
+              <ActionButton
+                action={setUserStatus.bind(null, user.id, "inactive")}
+                label="Make inactive"
+                pendingLabel="Saving…"
+                variant="danger"
+                confirmText={`Make ${user.name} inactive? They will be signed out and can no longer sign in.`}
+              />
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-zinc-600">Inactive: cannot sign in, no new monthly drafts.</p>
+            <ActionButton
+              action={setUserStatus.bind(null, user.id, "active")}
+              label="Make active again"
+              pendingLabel="Saving…"
+              variant="primary"
+            />
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}

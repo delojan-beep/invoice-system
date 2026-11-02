@@ -35,7 +35,7 @@ export function ActionButton({
       <Btn type="submit" variant={variant} disabled={pending}>
         {pending ? pendingLabel : label}
       </Btn>
-      <Message error={state.error} />
+      <Message error={state.error} message={state.message} />
     </form>
   );
 }

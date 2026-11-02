@@ -5,24 +5,24 @@ import { STATUS_LABELS } from "@/src/domain/invoice";
 type Variant = "primary" | "secondary" | "danger" | "link";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800",
-  secondary: "rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50",
-  danger: "rounded-md border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50",
-  link: "text-sm font-medium text-blue-700 hover:underline",
+  primary: "inline-flex min-h-11 items-center justify-center rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-blue-800 active:bg-blue-900",
+  secondary: "inline-flex min-h-11 items-center justify-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 transition-colors duration-150 hover:bg-zinc-50 active:bg-zinc-100",
+  danger: "inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 transition-colors duration-150 hover:bg-red-50 active:bg-red-100",
+  link: "inline-flex min-h-11 items-center rounded-sm text-sm font-medium text-blue-700 hover:underline",
 };
 
 export function Btn({ variant = "primary", className = "", ...props }: { variant?: Variant } & ComponentProps<"button">) {
   return <button {...props} className={`${VARIANTS[variant]} disabled:cursor-not-allowed disabled:opacity-50 ${className}`} />;
 }
 
-const FIELD = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20 sm:text-sm";
+const FIELD = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 min-h-11 transition-colors duration-150 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/40 aria-[invalid=true]:border-red-600 sm:text-sm";
 
 export function Label({ text, hint, children }: { text: string; hint?: string; children: ReactNode }) {
   return (
     <label className="flex min-w-0 flex-col gap-1 text-sm font-medium text-zinc-700">
       {text}
       {children}
-      {hint && <span className="text-xs font-normal text-zinc-500">{hint}</span>}
+      {hint && <span className="text-xs font-normal text-zinc-600">{hint}</span>}
     </label>
   );
 }
@@ -38,14 +38,14 @@ export function Select(props: ComponentProps<"select">) {
 export function Message({ error, message }: { error?: string; message?: string }) {
   if (error) {
     return (
-      <p role="alert" className="text-sm text-red-700">
+      <p role="alert" className="flex items-start gap-1.5 text-sm text-red-700">
         {error}
       </p>
     );
   }
   if (message) {
     return (
-      <p role="status" className="text-sm text-green-700">
+      <p role="status" className="flex items-start gap-1.5 text-sm text-green-800">
         {message}
       </p>
     );

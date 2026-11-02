@@ -2,17 +2,26 @@ import "server-only";
 import { formatMonth } from "@/src/domain/format";
 import { isOverdue } from "@/src/domain/invoice";
 import { sendOnce } from "@/src/email/notify";
-import { dailySummary, deadlineWarning, monthlySummary, overdueAlert } from "@/src/email/templates";
+import { dailySummary, deadlineWarning, monthlySummary, overdueAlert, withNote } from "@/src/email/templates";
+import type { Attachment } from "@/src/email/transport";
+import { loadInvoicePdfData } from "@/src/pdf/invoice-data";
+import { renderInvoicePdf } from "@/src/pdf/invoice-pdf";
 import { createAdminClient } from "@/src/supabase/admin";
 import { isDailyDue, isMonthlyDue, localTime, parseClock } from "./clock";
 import { appUrl, getSettings, INVOICE_FIELDS, peopleWithRoles, toRow, type AppRole } from "./data";
 import { fetchRates } from "./rates";
+import { exportToSheet } from "./sheet";
 
 // Scheduled work, run every 15 minutes by /api/cron. Each job decides whether
 // it is due; sendOnce claims each email in the log before sending, so running
 // again, late, or twice at once never sends anything twice.
 
 export type JobResult = { job: string; ok: boolean; detail: string };
+
+/** The admin's note for one kind of email (settings → email wording). */
+function note(settings: Record<string, unknown>, type: string) {
+  return ((settings.email_wording ?? {}) as Record<string, unknown>)[type];
+}
 
 /** This month's draft for every active employee, in their own timezone. */
 export async function monthlyDrafts(): Promise<string> {
@@ -53,7 +62,7 @@ export async function dailySummaries(now: Date): Promise<string> {
       if (data.length === 0) return null;
       return {
         to: ceo.email,
-        ...dailySummary({
+        ...withNote(dailySummary({
           recipientName: ceo.name,
           overdue: data.filter((i) => isOverdue(i, now)).map((i) => toRow(i, "deadline", ceo.timezone, now)),
           waiting: data
@@ -62,7 +71,7 @@ export async function dailySummaries(now: Date): Promise<string> {
           toPay: data.filter((i) => i.status === "approved").map((i) => toRow(i, "approved", ceo.timezone, now)),
           fields,
           link: appUrl("/approver"),
-        }),
+        }), note(settings, "daily_summary")),
       };
     });
     results.push(`${ceo.name} (${today}): ${status}${status === "sent" ? ` (${data.length} invoices)` : ""}`);
@@ -73,6 +82,7 @@ export async function dailySummaries(now: Date): Promise<string> {
 /** 24 hours before an invoice's review deadline, once per submission. */
 export async function deadlineWarnings(now: Date): Promise<string> {
   const supabase = createAdminClient();
+  const settings = await getSettings();
   const { data, error } = await supabase
     .from("invoices")
     .select(INVOICE_FIELDS)
@@ -90,11 +100,11 @@ export async function deadlineWarnings(now: Date): Promise<string> {
       data.map((i) => ({ invoiceId: i.id, period: i.submitted_at ?? "" })),
       (claimed) => ({
         to: ceo.email,
-        ...deadlineWarning({
+        ...withNote(deadlineWarning({
           recipientName: ceo.name,
           invoices: data.filter((i) => claimed.includes(i.id)).map((i) => toRow(i, "deadline", ceo.timezone, now)),
           link: appUrl("/approver"),
-        }),
+        }), note(settings, "deadline_warning")),
       }),
     );
     results.push(`${ceo.name}: ${status}`);
@@ -105,6 +115,7 @@ export async function deadlineWarnings(now: Date): Promise<string> {
 /** Once, when the review deadline passes without approval: tell accounts. */
 export async function overdueAlerts(now: Date): Promise<string> {
   const supabase = createAdminClient();
+  const settings = await getSettings();
   const { data, error } = await supabase
     .from("invoices")
     .select(INVOICE_FIELDS)
@@ -121,11 +132,11 @@ export async function overdueAlerts(now: Date): Promise<string> {
       data.map((i) => ({ invoiceId: i.id, period: i.submitted_at ?? "" })),
       (claimed) => ({
         to: person.email,
-        ...overdueAlert({
+        ...withNote(overdueAlert({
           recipientName: person.name,
           invoices: data.filter((i) => claimed.includes(i.id)).map((i) => toRow(i, "deadline", person.timezone, now)),
           link: appUrl("/accounts?status=overdue"),
-        }),
+        }), note(settings, "overdue_alert")),
       }),
     );
     results.push(`${person.name}: ${status}`);
@@ -153,21 +164,44 @@ export async function monthlySummaries(now: Date): Promise<string> {
     .order("number");
   if (error) throw error;
 
+  // Each invoice's PDF is attached; made once, and only after a claim succeeds.
+  let attachments: Attachment[] | null = null;
+  const pdfs = async () => {
+    attachments ??= await invoicePdfs(data.map((i) => i.id), tz);
+    return attachments;
+  };
+
   const results: string[] = [];
   for (const person of await peopleWithRoles(roles)) {
-    // Invoice PDFs are attached once PDF generation lands (M6).
-    const status = await sendOnce("monthly_summary", person.email, [{ invoiceId: null, period: local.month }], () => ({
+    const status = await sendOnce("monthly_summary", person.email, [{ invoiceId: null, period: local.month }], async () => ({
       to: person.email,
-      ...monthlySummary({
+      attachments: await pdfs(),
+      ...withNote(monthlySummary({
         recipientName: person.name,
         month: formatMonth(`${local.month}-01`),
         rows: data.map((i) => toRow(i, "submitted", person.timezone, now)),
         link: appUrl(`/accounts?month=${local.month}`),
-      }),
+      }), note(settings, "monthly_summary")),
     }));
     results.push(`${person.name} (${local.month}): ${status}`);
   }
   return results.join("; ");
+}
+
+/** Invoice PDFs as email attachments, named by invoice number. */
+async function invoicePdfs(invoiceIds: string[], timeZone: string): Promise<Attachment[]> {
+  const supabase = createAdminClient();
+  const files: Attachment[] = [];
+  for (const id of invoiceIds) {
+    const data = await loadInvoicePdfData(supabase, id, timeZone);
+    if (!data) continue;
+    files.push({
+      filename: `${data.invoice.number ?? id}.pdf`,
+      contentBase64: Buffer.from(await renderInvoicePdf(data)).toString("base64"),
+      contentType: "application/pdf",
+    });
+  }
+  return files;
 }
 
 /** Runs every job; one failing job does not stop the others. */
@@ -179,6 +213,7 @@ export async function runJobs(now: Date): Promise<JobResult[]> {
     ["overdue_alerts", () => overdueAlerts(now)],
     ["daily_summary", () => dailySummaries(now)],
     ["monthly_summary", () => monthlySummaries(now)],
+    ["sheet_backup", () => exportToSheet(now)],
   ];
   const results: JobResult[] = [];
   for (const [job, run] of jobs) {

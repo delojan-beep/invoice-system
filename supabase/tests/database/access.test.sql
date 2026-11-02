@@ -102,7 +102,7 @@ select results_eq(
 );
 select is((select count(*) from public.line_items), 1::bigint, 'an employee sees the lines of their own invoice');
 select is((select count(*) from public.profiles), 1::bigint, 'an employee sees only their own profile');
-select is((select count(*) from public.currencies), 2::bigint, 'an employee can read reference data');
+select is((select count(*) from public.currencies where code in ('LKR', 'CAD')), 2::bigint, 'an employee can read reference data');
 select is((select count(*) from public.user_roles), 1::bigint, 'an employee sees only their own roles');
 select throws_ok(
   $$ insert into public.user_roles (user_id, role) values ('00000000-0000-0000-0000-0000000000e1', 'admin') $$,
@@ -143,14 +143,14 @@ reset role;
 
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000d1', 'aal1');
 select throws_ok(
-  $$ insert into public.currencies (code, name, symbol, decimal_places) values ('USD', 'US dollar', '$', 2) $$,
+  $$ insert into public.currencies (code, name, symbol, decimal_places) values ('XTS', 'Test currency', 'T', 2) $$,
   '42501', null, 'an admin without two-factor cannot change reference data'
 );
 reset role;
 
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000d1', 'aal2');
 select lives_ok(
-  $$ insert into public.currencies (code, name, symbol, decimal_places) values ('USD', 'US dollar', '$', 2) $$,
+  $$ insert into public.currencies (code, name, symbol, decimal_places) values ('XTS', 'Test currency', 'T', 2) $$,
   'an admin with two-factor can add a currency'
 );
 reset role;
