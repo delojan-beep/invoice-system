@@ -293,7 +293,7 @@ export async function saveSettings(_prev: FormState, formData: FormData): Promis
     reminder_fields: s.reminder_fields,
     invoice_number_format: s.invoice_number_format,
     base_currency: s.base_currency,
-    wise_fee_payer: s.wise_fee_payer || null,
+    wise_fee_payer: s.wise_fee_payer, // "" = not decided; the column is not null, so JSON null cannot be written
     company: { name: s.company_name, business_number: s.company_bn, address: s.company_address },
     email_wording: {
       status_update: s.wording_status_update.trim(),

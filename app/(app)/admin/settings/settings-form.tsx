@@ -34,7 +34,7 @@ const WORDING: [string, string][] = [
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <fieldset className="flex flex-col gap-3 border-t border-zinc-200 pt-4 first:border-t-0 first:pt-0">
+    <fieldset className="flex min-w-0 flex-col gap-3 border-t border-zinc-200 pt-4 first:border-t-0 first:pt-0">
       <legend className="pb-1 text-base font-semibold text-zinc-900">{title}</legend>
       {children}
     </fieldset>

@@ -162,7 +162,7 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
                 action={confirmPayment.bind(null, invoice.id)}
                 invoiceCurrency={invoice.currency_code}
                 currencies={currencies}
-                defaultFeePaidBy={payment?.fee_paid_by ?? (feeSetting?.value as "company" | "deducted" | null) ?? null}
+                defaultFeePaidBy={payment?.fee_paid_by ?? ((feeSetting?.value as "company" | "deducted" | "" | null) || null)}
                 initial={{
                   transferId: payment?.wise_transfer_id ?? "",
                   sent: amount(payment?.amount_sent_minor ?? null, payment?.sent_currency ?? null),
