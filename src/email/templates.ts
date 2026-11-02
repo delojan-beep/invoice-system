@@ -25,6 +25,14 @@ export type InvoiceRow = {
 
 type Rendered = { subject: string; html: string; text: string };
 
+/** Adds the admin's note for this kind of email (settings → email wording) under the heading. */
+export function withNote(email: Rendered, note: unknown): Rendered {
+  const text = typeof note === "string" ? note.trim() : "";
+  if (!text) return email;
+  const para = `<p style="margin:0 0 16px;padding:8px 12px;background:#eff6ff;border-radius:8px">${e(text).replace(/\n/g, "<br>")}</p>`;
+  return { ...email, html: email.html.replace("</h1>", `</h1>\n${para}`), text: `${text}\n\n${email.text}` };
+}
+
 function layout(heading: string, body: string, footer = "Sent by QNetwork Invoices.") {
   return `<!doctype html><html><body style="margin:0;background:#f4f4f5;font-family:Arial,Helvetica,sans-serif;color:#18181b">
 <div style="max-width:640px;margin:0 auto;padding:24px">

@@ -81,7 +81,10 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
           <h1 className="text-2xl font-semibold text-zinc-900">{formatMonth(invoice.month)}</h1>
           <StatusBadge status={invoice.status} overdue={overdue} />
         </div>
-        <p className="mt-1 font-mono text-sm text-zinc-600">{invoice.number ?? "Number assigned when you submit"}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+          <p className="font-mono text-sm text-zinc-600">{invoice.number ?? "Number assigned when you submit"}</p>
+          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="text-sm font-medium text-blue-700 hover:underline">Download PDF</a>
+        </div>
       </div>
 
       <StatusNote invoice={invoice} tz={tz} rejection={lastRejection?.comment ?? null} received={received} />

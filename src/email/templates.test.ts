@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dailySummary, escapeHtml, monthlySummary, statusUpdate, type InvoiceRow } from "./templates";
+import { dailySummary, escapeHtml, monthlySummary, statusUpdate, withNote, type InvoiceRow } from "./templates";
 
 const row = (over: Partial<InvoiceRow> = {}): InvoiceRow => ({
   employee: "Nimal Perera",
@@ -64,6 +64,22 @@ describe("dailySummary", () => {
     expect(email.html).toContain("QN-E014-2026-10-001");
     expect(email.html).not.toContain("Rs 250,000.00");
     expect(email.subject).toBe("1 invoice not yet paid");
+  });
+});
+
+describe("withNote", () => {
+  const base = statusUpdate({ employeeName: "N", month: "October 2026", number: "N1", total: "$ 1.00", event: "approved", link: "l" });
+
+  it("adds the admin's note under the heading, escaped, and at the top of the text", () => {
+    const email = withNote(base, "Payday is the 25th <b>sharp</b>");
+    expect(email.html).toMatch(/<\/h1>\n<p[^>]*>Payday is the 25th &lt;b&gt;sharp&lt;\/b&gt;<\/p>/);
+    expect(email.text.startsWith("Payday is the 25th <b>sharp</b>\n\n")).toBe(true);
+    expect(email.subject).toBe(base.subject);
+  });
+
+  it("changes nothing when there is no note", () => {
+    expect(withNote(base, "")).toEqual(base);
+    expect(withNote(base, undefined)).toEqual(base);
   });
 });
 

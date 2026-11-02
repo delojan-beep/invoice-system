@@ -43,7 +43,7 @@ export async function sendOnce(
   type: NotificationType,
   recipient: string,
   claims: Claim[],
-  build: (claimedInvoiceIds: string[]) => Email | null,
+  build: (claimedInvoiceIds: string[]) => Email | null | Promise<Email | null>,
 ): Promise<"sent" | "failed" | "skipped" | "already sent"> {
   const supabase = createAdminClient();
   const { data: won, error } = await supabase.rpc("claim_notifications", {
@@ -57,7 +57,6 @@ export async function sendOnce(
   if (!won.length) return "already sent";
 
   const logIds = won.map((w) => w.claimed_log_id);
-  const email = build(won.map((w) => w.claimed_invoice_id).filter(Boolean));
   const finish = (status: string, subject: string | null, providerId: string | null, err: string | null) =>
     supabase.rpc("finish_notifications", {
       p_log_ids: logIds,
@@ -66,6 +65,15 @@ export async function sendOnce(
       p_provider_message_id: providerId as string,
       p_error: err as string,
     });
+
+  let email: Email | null;
+  try {
+    email = await build(won.map((w) => w.claimed_invoice_id).filter(Boolean));
+  } catch (err) {
+    // Building failed (e.g. a PDF): free the claim so the next run retries.
+    await finish("failed", null, null, err instanceof Error ? err.message : String(err));
+    throw err;
+  }
 
   if (!email) {
     await finish("skipped", null, null, "Nothing to send");

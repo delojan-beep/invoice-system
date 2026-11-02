@@ -2,7 +2,7 @@
 -- and the audit trail, walked through one invoice's life. Run with `pnpm test:db`.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(57);
+select plan(58);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures
@@ -359,8 +359,12 @@ insert into ids select 'nov', id from public.invoices
 
 select results_eq(
   $$ select description, rate_minor from public.line_items where invoice_id = (select id from ids where k = 'nov') $$,
-  $$ values ('October professional fees', 25000000::bigint) $$,
-  'it is pre-filled with the usual professional fees line'
+  $$ values ('November professional fees', 25000000::bigint) $$,
+  'it is pre-filled with the usual line, reworded for the new month'
+);
+select is(
+  private.reword_month('December 2026 consulting', '2026-12-01', '2027-01-01'),
+  'January 2027 consulting', 'the month name and the year both move on'
 );
 
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000e1', 'aal1');

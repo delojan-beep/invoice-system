@@ -80,6 +80,23 @@ curl -H "Authorization: Bearer $CRON_SECRET" "http://localhost:3000/api/cron?now
 
 `?now=` is ignored in production. Email goes through Resend when `RESEND_API_KEY` is set, otherwise to Mailpit (`MAILPIT_URL`); production refuses to run without Resend.
 
+## Invoice PDFs and the Google Sheet backup
+
+- `/pdf/<invoice id>` returns the invoice PDF (owner and staff only): QNetwork's Business Number and address, the worker's name, address and NIC/TIN, lines and totals. Both invoice pages link to it, and the monthly summary attaches the month's PDFs.
+- The `sheet_backup` job appends each approved invoice to the backup sheet once (`GOOGLE_SA_JSON`, `BACKUP_SHEET_ID`). Values are written as plain values, never formulas.
+
+## Launch checklist
+
+The admin overview (`/admin`) shows most of these live.
+
+1. **Supabase project (production):** Pro plan for daily database backups. Link it and run `supabase db push`; reference data and default settings come with the migrations. In Auth settings, set the Site URL and add `https://<domain>/auth/confirm` to redirect URLs, keep sign-ups off, and turn on TOTP MFA.
+2. **Receipts and PDFs backup:** Supabase backups cover the database, not Storage files. Schedule a copy of the `attachments` bucket (e.g. `supabase storage cp` or rclone to another bucket) daily.
+3. **Vercel:** Pro plan (for the 15-minute cron), environment variables from `.env.example` (no `MAILPIT_URL`), `APP_URL` set to the real domain.
+4. **Email:** verify the sending domain in Resend; set `RESEND_API_KEY` and `EMAIL_FROM`.
+5. **Admin settings:** company Business Number and address, who pays Wise fees, then add every employee with their code, currency, address and NIC/TIN.
+6. **Open decisions:** the exchange-rate provider (`FX_PROVIDER`), and the accountant's tax confirmation before switching any tax rate on.
+7. **Pilot:** admin, CEO and two or three employees for one monthly cycle; keep the Google Sheet as a read-only backup; retire it after a few months of matching records.
+
 ## How access works
 
 - `proxy.ts` refreshes the session and sends signed-out visitors to `/login`.
