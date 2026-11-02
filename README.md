@@ -59,7 +59,7 @@ scripts/          dev user seeding
 
 ## Scheduled jobs and email
 
-Vercel Cron calls `/api/cron` every 15 minutes (`vercel.json`; needs the Vercel Pro plan, as Hobby allows one run a day) with `Authorization: Bearer $CRON_SECRET`. Each job checks the clock in the right timezone and the notification log, so a late or repeated run never sends anything twice:
+An outside scheduler calls `/api/cron` every 15 minutes with `Authorization: Bearer $CRON_SECRET` (cron-job.org works on the free tier; Vercel Hobby only allows one cron run a day, so `vercel.json` has none. On Vercel Pro you can add `"crons": [{ "path": "/api/cron", "schedule": "*/15 * * * *" }]` back). Each job checks the clock in the right timezone and the notification log, so a late or repeated run never sends anything twice:
 
 | Job | When | To |
 | --- | --- | --- |
@@ -91,7 +91,7 @@ The admin overview (`/admin`) shows most of these live.
 
 1. **Supabase project (production):** Pro plan for daily database backups. Link it and run `supabase db push`; reference data and default settings come with the migrations. In Auth settings, set the Site URL and add `https://<domain>/auth/confirm` to redirect URLs, keep sign-ups off, and turn on TOTP MFA.
 2. **Receipts and PDFs backup:** Supabase backups cover the database, not Storage files. Schedule a copy of the `attachments` bucket (e.g. `supabase storage cp` or rclone to another bucket) daily.
-3. **Vercel:** Pro plan (for the 15-minute cron), environment variables from `.env.example` (no `MAILPIT_URL`), `APP_URL` set to the real domain.
+3. **Vercel:** a scheduler that calls `/api/cron` every 15 minutes (see Scheduled jobs), environment variables from `.env.example` (no `MAILPIT_URL`), `APP_URL` set to the real domain.
 4. **Email:** verify the sending domain in Resend; set `RESEND_API_KEY` and `EMAIL_FROM`.
 5. **Admin settings:** company Business Number and address, who pays Wise fees, then add every employee with their code, currency, address and NIC/TIN.
 6. **Open decisions:** the exchange-rate provider (`FX_PROVIDER`), and the accountant's tax confirmation before switching any tax rate on.
