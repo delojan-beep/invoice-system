@@ -53,7 +53,7 @@ export function Uploader({
 
   return (
     <div className="flex flex-col gap-1">
-      <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-md border border-dashed border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50">
+      <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-md border border-dashed border-zinc-300 px-3 py-2.5 min-h-11 text-sm text-zinc-700 hover:bg-zinc-50">
         {busy ? "Uploading…" : "Attach receipt"}
         <input
           ref={input}

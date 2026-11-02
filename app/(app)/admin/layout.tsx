@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
     <div className="flex flex-col gap-6">
       <nav className="flex flex-wrap gap-x-5 gap-y-2 border-b border-zinc-200 pb-3 text-sm">
         {SECTIONS.map((s) => (
-          <Link key={s.href} href={s.href} className="text-zinc-700 hover:text-blue-700">
+          <Link key={s.href} href={s.href} className="text-zinc-700 hover:text-brand-700">
             {s.label}
           </Link>
         ))}

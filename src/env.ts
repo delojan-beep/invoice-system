@@ -19,6 +19,11 @@ export function publicEnv() {
   });
 }
 
+// On only once the Google provider is set up in Supabase; otherwise the button would lead to an error page.
+export function googleSignInEnabled() {
+  return process.env.GOOGLE_SIGN_IN === "on";
+}
+
 export function serverEnv() {
   return serverSchema.parse({ SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY });
 }

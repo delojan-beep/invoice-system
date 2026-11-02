@@ -4,7 +4,7 @@ import { requireAccess } from "@/src/auth/dal";
 import { getReferenceLists, getUser, timezones } from "@/src/domain/admin-queries";
 import { ActionButton } from "@/src/ui/action-button";
 import { Card } from "@/src/ui/controls";
-import { setUserStatus, updateUser } from "../../actions";
+import { resendInvitation, setUserStatus, updateUser } from "../../actions";
 import { UserForm } from "../user-form";
 
 // Waits for the access check on the server before rendering (see Cache Components docs).
@@ -23,13 +23,18 @@ export default async function UserPage({ params, searchParams }: PageProps<"/adm
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/admin/users" className="text-sm text-blue-700 hover:underline">
+        <Link href="/admin/users" className="text-sm text-brand-700 hover:underline">
           ← Users
         </Link>
         <h1 className="mt-2 text-2xl font-semibold text-zinc-900">{user.name}</h1>
-        {created && (
+        {created === "1" && (
           <p role="status" className="mt-2 text-sm text-green-700">
-            Added. They can sign in with an email link sent to {user.email}.
+            Added. An invitation is on its way to {user.email}.
+          </p>
+        )}
+        {created === "not-invited" && (
+          <p role="alert" className="mt-2 text-sm text-red-700">
+            Added, but the invitation could not be sent. Use &ldquo;Send invitation&rdquo; below to try again.
           </p>
         )}
       </div>
@@ -53,6 +58,17 @@ export default async function UserPage({ params, searchParams }: PageProps<"/adm
           }}
         />
       </Card>
+
+      {user.status === "active" && !isSelf && (
+        <Card title="Invitation">
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-zinc-600">
+              Emails a new sign-in link, in case the first one expired or got lost. The link replaces any earlier one.
+            </p>
+            <ActionButton action={resendInvitation.bind(null, user.id)} label="Send invitation" pendingLabel="Sending…" />
+          </div>
+        </Card>
+      )}
 
       <Card title="Status">
         {user.status === "active" ? (

@@ -56,7 +56,7 @@ export default async function EmployeePage() {
             </div>
             <Link
               href={`/employee/invoices/${current.id}`}
-              className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800"
+              className="inline-flex min-h-11 items-center justify-center rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800"
             >
               {current.status === "draft" || current.status === "rejected" ? "Open and edit" : "View"}
             </Link>

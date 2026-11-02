@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/src/supabase/server";
-import { decideAccess, ROLES, type AppRole, type ViewerState } from "./access";
+import { decideAccess, needsPasswordSetup, ROLES, type AccessDecision, type AppRole, type ViewerState } from "./access";
 
 export type Viewer = ViewerState & {
   id: string;
@@ -17,6 +17,7 @@ const SIGNED_OUT: Viewer = {
   roles: [],
   aal: "aal1",
   hasVerifiedFactor: false,
+  needsPassword: false,
   id: "",
   email: "",
   name: "",
@@ -49,6 +50,7 @@ export const getViewer = cache(async (): Promise<Viewer> => {
     roles,
     aal: claims.aal === "aal2" ? "aal2" : "aal1",
     hasVerifiedFactor: (factors?.totp.length ?? 0) > 0,
+    needsPassword: needsPasswordSetup(claims),
     id: claims.sub,
     email: profile?.email ?? claims.email ?? "",
     name: profile?.name ?? "",
@@ -62,11 +64,21 @@ export const getViewer = cache(async (): Promise<Viewer> => {
  */
 export async function requireAccess(anyOf: readonly AppRole[] = []): Promise<Viewer> {
   const viewer = await getViewer();
-  const decision = decideAccess(viewer, anyOf);
+  enforce(decideAccess(viewer, anyOf));
+  return viewer;
+}
 
+// For the password page: everything except the password prompt itself still applies.
+export async function requirePasswordPageAccess(): Promise<Viewer> {
+  const viewer = await getViewer();
+  enforce(decideAccess({ ...viewer, needsPassword: false }));
+  return viewer;
+}
+
+function enforce(decision: AccessDecision) {
   switch (decision) {
     case "ok":
-      return viewer;
+      return;
     case "login":
       redirect("/login");
     case "inactive":
@@ -75,6 +87,8 @@ export async function requireAccess(anyOf: readonly AppRole[] = []): Promise<Vie
       redirect("/mfa/enroll");
     case "verify-mfa":
       redirect("/mfa/verify");
+    case "set-password":
+      redirect("/set-password");
     case "forbidden":
       redirect("/?error=forbidden");
   }

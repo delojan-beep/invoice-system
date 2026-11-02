@@ -92,10 +92,18 @@ The admin overview (`/admin`) shows most of these live.
 1. **Supabase project (production):** Pro plan for daily database backups. Link it and run `supabase db push`; reference data and default settings come with the migrations. In Auth settings, set the Site URL and add `https://<domain>/auth/confirm` to redirect URLs, keep sign-ups off, and turn on TOTP MFA.
 2. **Receipts and PDFs backup:** Supabase backups cover the database, not Storage files. Schedule a copy of the `attachments` bucket (e.g. `supabase storage cp` or rclone to another bucket) daily.
 3. **Vercel:** a scheduler that calls `/api/cron` every 15 minutes (see Scheduled jobs), environment variables from `.env.example` (no `MAILPIT_URL`), `APP_URL` set to the real domain.
-4. **Email:** verify the sending domain in Resend; set `RESEND_API_KEY` and `EMAIL_FROM`.
+4. **Email:** verify the sending domain in Resend; set `RESEND_API_KEY` and `EMAIL_FROM`. Supabase sends the "Email me a link" messages itself, so also set Resend as its SMTP server (Auth → Emails → SMTP: `smtp.resend.com`, port 465, user `resend`, password = the API key), raise the email rate limit, and set the email OTP expiry to 86400 seconds (the emails promise 24 hours).
+   **Google (optional):** create an OAuth client in Google Cloud with the redirect URI `https://<project>.supabase.co/auth/v1/callback`, turn on the Google provider in Supabase, then set `GOOGLE_SIGN_IN=on` in Vercel and redeploy.
 5. **Admin settings:** company Business Number and address, who pays Wise fees, then add every employee with their code, currency, address and NIC/TIN.
 6. **Open decisions:** the exchange-rate provider (`FX_PROVIDER`), and the accountant's tax confirmation before switching any tax rate on.
 7. **Pilot:** admin, CEO and two or three employees for one monthly cycle; keep the Google Sheet as a read-only backup; retire it after a few months of matching records.
+
+## How people sign in
+
+1. The admin adds a person at `/admin/users`. The app emails them an invitation through the normal email route (Resend, or Mailpit locally). The person's page has a "Send invitation" button if it expired.
+2. The invitation's one-time link signs them in. Approver, accounts and admin set up two-factor first.
+3. Anyone who arrived by email link and has no password is sent to `/set-password`, then to their home page. "Change password" in the header opens the same page, so a forgotten password is: request an email link, sign in, change it.
+4. After that they can use their password, an email link, or Continue with Google. Google only works for an address the admin has added, because sign-ups are off.
 
 ## How access works
 

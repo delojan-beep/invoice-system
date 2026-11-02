@@ -98,7 +98,7 @@ export function LineItem({
         <ul className="flex flex-col gap-1">
           {line.attachments.map((a) => (
             <li key={a.id} className="flex flex-wrap items-center gap-3 text-sm">
-              <a href={`/attachments/${a.id}`} target="_blank" rel="noopener" className="text-blue-700 hover:underline">
+              <a href={`/attachments/${a.id}`} target="_blank" rel="noopener" className="text-brand-700 hover:underline">
                 {a.file_name}
               </a>
               <span className="text-zinc-500">{formatFileSize(a.size_bytes)}</span>

@@ -48,6 +48,24 @@ function button(link: string, label: string) {
   return `<p style="margin:20px 0 0"><a href="${e(link)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;padding:10px 16px;border-radius:6px;font-size:14px">${e(label)}</a></p>`;
 }
 
+export function invitation(input: { name: string; link: string; signInLink: string; google: boolean }): Rendered {
+  const googleHtml = input.google
+    ? `<p style="margin:12px 0 0;font-size:14px">If this address is a Google account, you can also use <strong>Continue with Google</strong> on the <a href="${e(input.signInLink)}" style="color:#1d4ed8">sign-in page</a>.</p>`
+    : "";
+  const googleText = input.google ? `\n\nIf this address is a Google account, you can also use Continue with Google: ${input.signInLink}` : "";
+  return {
+    subject: "You've been invited to QNetwork Invoices",
+    html: layout(
+      "Welcome to QNetwork Invoices",
+      `<p style="margin:0 0 12px">Hi ${e(input.name)}, an account has been created for you. Use this button to sign in and set up your password.</p>
+${button(input.link, "Sign in and set up your password")}
+<p style="margin:16px 0 0;font-size:14px;color:#52525b">The button works once and expires in 24 hours. If it has expired, choose &ldquo;Email me a sign-in link&rdquo; on the <a href="${e(input.signInLink)}" style="color:#1d4ed8">sign-in page</a>.</p>
+${googleHtml}`,
+    ),
+    text: `Hi ${input.name}, an account has been created for you on QNetwork Invoices.\n\nSign in and set up your password (works once, expires in 24 hours):\n${input.link}\n\nIf it has expired, ask for a new email link on the sign-in page: ${input.signInLink}${googleText}`,
+  };
+}
+
 type Column = { key: keyof InvoiceRow; label: string };
 
 function table(rows: InvoiceRow[], columns: Column[]) {

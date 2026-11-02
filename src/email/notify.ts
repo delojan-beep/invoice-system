@@ -3,6 +3,7 @@ import { createAdminClient } from "@/src/supabase/admin";
 import { deliver, type Email } from "./transport";
 
 export type NotificationType =
+  | "invitation"
   | "status_update"
   | "daily_summary"
   | "deadline_warning"

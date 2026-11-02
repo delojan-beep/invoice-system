@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dailySummary, escapeHtml, monthlySummary, statusUpdate, withNote, type InvoiceRow } from "./templates";
+import { dailySummary, escapeHtml, invitation, monthlySummary, statusUpdate, withNote, type InvoiceRow } from "./templates";
 
 const row = (over: Partial<InvoiceRow> = {}): InvoiceRow => ({
   employee: "Nimal Perera",
@@ -11,6 +11,23 @@ const row = (over: Partial<InvoiceRow> = {}): InvoiceRow => ({
   date: "Nov 7, 2026",
   link: "http://localhost:3000/invoices/abc",
   ...over,
+});
+
+describe("invitation", () => {
+  const input = { name: "<Nimal>", link: "http://localhost:3000/auth/confirm?token_hash=abc&type=magiclink", signInLink: "http://localhost:3000/login" };
+
+  it("carries the link and escapes the name", () => {
+    const mail = invitation({ ...input, google: false });
+    expect(mail.html).toContain("token_hash=abc&amp;type=magiclink");
+    expect(mail.text).toContain(input.link);
+    expect(mail.html).toContain("&lt;Nimal&gt;");
+    expect(mail.html).not.toContain("Continue with Google");
+  });
+
+  it("mentions Google only when it is on", () => {
+    expect(invitation({ ...input, google: true }).html).toContain("Continue with Google");
+    expect(invitation({ ...input, google: true }).text).toContain("Continue with Google");
+  });
 });
 
 describe("escapeHtml", () => {

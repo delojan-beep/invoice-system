@@ -1,0 +1,47 @@
+"use client";
+
+import { Button, Field, Notice } from "@/src/ui/auth-card";
+import { Message } from "@/src/ui/controls";
+import { useFormAction } from "@/src/ui/use-form-action";
+import { setPassword } from "./actions";
+
+export function PasswordForm() {
+  const [state, onSubmit, pending] = useFormAction(setPassword);
+  const invalid = (field: string) => (state.field === field ? true : undefined);
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      {state.error && !state.field && <Notice tone="error">{state.error}</Notice>}
+      <div className="flex flex-col gap-1">
+        <Field
+          label="New password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          aria-describedby="password-help"
+          aria-invalid={invalid("password")}
+          autoFocus
+          required
+        />
+        <p id="password-help" className="text-xs text-zinc-600">
+          At least 10 characters, with both letters and numbers.
+        </p>
+        {state.field === "password" && <Message error={state.error} />}
+      </div>
+      <div className="flex flex-col gap-1">
+        <Field
+          label="Confirm password"
+          name="confirm"
+          type="password"
+          autoComplete="new-password"
+          aria-invalid={invalid("confirm")}
+          required
+        />
+        {state.field === "confirm" && <Message error={state.error} />}
+      </div>
+      <Button type="submit" disabled={pending}>
+        {pending ? "Saving…" : "Save password"}
+      </Button>
+    </form>
+  );
+}

@@ -15,7 +15,7 @@ export function NavLink({ href, children }: { href: string; children: ReactNode 
       aria-current={active ? "page" : undefined}
       className={`inline-flex min-h-11 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-150 ${
         active
-          ? "border-blue-700 text-blue-800"
+          ? "border-accent-600 text-brand-800"
           : "border-transparent text-zinc-700 hover:border-zinc-300 hover:text-zinc-900"
       }`}
     >

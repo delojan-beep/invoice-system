@@ -5,17 +5,17 @@ import { STATUS_LABELS } from "@/src/domain/invoice";
 type Variant = "primary" | "secondary" | "danger" | "link";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "inline-flex min-h-11 items-center justify-center rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-blue-800 active:bg-blue-900",
+  primary: "inline-flex min-h-11 items-center justify-center rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-brand-800 active:bg-brand-900",
   secondary: "inline-flex min-h-11 items-center justify-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 transition-colors duration-150 hover:bg-zinc-50 active:bg-zinc-100",
   danger: "inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 transition-colors duration-150 hover:bg-red-50 active:bg-red-100",
-  link: "inline-flex min-h-11 items-center rounded-sm text-sm font-medium text-blue-700 hover:underline",
+  link: "inline-flex min-h-11 items-center rounded-sm text-sm font-medium text-brand-700 hover:underline",
 };
 
 export function Btn({ variant = "primary", className = "", ...props }: { variant?: Variant } & ComponentProps<"button">) {
   return <button {...props} className={`${VARIANTS[variant]} disabled:cursor-not-allowed disabled:opacity-50 ${className}`} />;
 }
 
-const FIELD = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 min-h-11 transition-colors duration-150 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/40 aria-[invalid=true]:border-red-600 sm:text-sm";
+const FIELD = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 min-h-11 transition-colors duration-150 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/40 aria-[invalid=true]:border-red-600 sm:text-sm";
 
 export function Label({ text, hint, children }: { text: string; hint?: string; children: ReactNode }) {
   return (
@@ -55,7 +55,7 @@ export function Message({ error, message }: { error?: string; message?: string }
 
 const BADGE: Record<InvoiceStatus | "overdue", string> = {
   draft: "bg-zinc-100 text-zinc-700",
-  submitted: "bg-blue-50 text-blue-800",
+  submitted: "bg-brand-50 text-brand-800",
   approved: "bg-emerald-50 text-emerald-800",
   rejected: "bg-amber-50 text-amber-900",
   paid: "bg-emerald-600 text-white",

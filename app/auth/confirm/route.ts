@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
   const target = request.nextUrl.clone();
   target.search = "";
   target.pathname = ok ? "/" : "/login";
-  if (!ok) target.searchParams.set("error", "link");
+  // Google sends people back with an error when no one here has that address.
+  if (!ok) target.searchParams.set("error", searchParams.has("error") ? "google" : "link");
   return NextResponse.redirect(target);
 }

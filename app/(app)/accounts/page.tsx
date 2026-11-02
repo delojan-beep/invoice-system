@@ -11,7 +11,7 @@ import { filtersToQuery, parseFilters } from "./filters";
 export const instant = false;
 
 const SELECT =
-  "rounded-md border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 focus:border-blue-600 focus:outline-none sm:text-sm";
+  "rounded-md border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 focus:border-brand-600 focus:outline-none sm:text-sm";
 
 export default async function AccountsPage({ searchParams }: PageProps<"/accounts">) {
   await requireAccess(["accounts"]);
@@ -32,7 +32,7 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
         <h1 className="text-2xl font-semibold text-zinc-900">All invoices</h1>
         <a
           href={`/accounts/export${query ? `?${query}` : ""}`}
-          className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+          className="inline-flex min-h-11 items-center justify-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
         >
           Export CSV
         </a>
@@ -78,11 +78,11 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
             <option value="unconfirmed">Paid, not confirmed</option>
           </select>
         </label>
-        <button type="submit" className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800">
+        <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800">
           Filter
         </button>
         {query && (
-          <Link href="/accounts" className="py-2 text-sm text-blue-700 hover:underline">
+          <Link href="/accounts" className="py-2 text-sm text-brand-700 hover:underline">
             Clear
           </Link>
         )}
@@ -118,7 +118,7 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
                   return (
                     <tr key={i.id} className="align-top">
                       <td className="px-4 py-3 sm:pl-0">
-                        <Link href={`/invoices/${i.id}?from=accounts`} className="font-medium text-blue-700 hover:underline">
+                        <Link href={`/invoices/${i.id}?from=accounts`} className="font-medium text-brand-700 hover:underline">
                           {i.employee?.name}
                         </Link>
                         <div className="text-xs text-zinc-500">{formatMonth(i.month)}</div>

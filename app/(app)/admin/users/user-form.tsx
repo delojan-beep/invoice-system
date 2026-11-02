@@ -40,7 +40,7 @@ export function UserForm({
         <Label text="Name">
           <Input name="name" defaultValue={initial.name} required maxLength={200} />
         </Label>
-        <Label text="Email" hint="They sign in with a link sent here">
+        <Label text="Email" hint="We email their invitation here">
           <Input name="email" type="email" defaultValue={initial.email} required />
         </Label>
       </div>
@@ -90,7 +90,7 @@ export function UserForm({
             rows={2}
             defaultValue={initial.address}
             maxLength={500}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-base text-zinc-900 focus:border-blue-600 focus:outline-none sm:text-sm"
+            className="rounded-md border border-zinc-300 px-3 py-2 text-base text-zinc-900 focus:border-brand-600 focus:outline-none sm:text-sm"
           />
         </Label>
         <div className="flex flex-col gap-3">

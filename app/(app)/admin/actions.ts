@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ROLES } from "@/src/auth/access";
 import { requireAccess } from "@/src/auth/dal";
+import { sendInvitation } from "@/src/email/invite";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { toResult } from "@/src/domain/invoice-actions";
 import { createAdminClient } from "@/src/supabase/admin";
@@ -97,7 +98,7 @@ export async function createUser(_prev: FormState, formData: FormData): Promise<
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const u = parsed.data;
 
-  // No password: they sign in with an email link (or set one later).
+  // No password yet: the invitation signs them in, then they choose one.
   const auth = createAdminClient().auth.admin;
   const { data: created, error: authError } = await auth.createUser({ email: u.email, email_confirm: true });
   if (authError || !created.user) return { error: friendly(authError?.message ?? "") ?? "Could not create the sign-in account" };
@@ -116,7 +117,8 @@ export async function createUser(_prev: FormState, formData: FormData): Promise<
     const err = (profileError ?? rolesError)!;
     return { error: friendly(err.message) ?? failed(err).error };
   }
-  redirect(`/admin/users/${id}?created=1`);
+  const invited = await sendInvitation({ name: u.name, email: u.email });
+  redirect(`/admin/users/${id}?created=${invited === "sent" ? "1" : "not-invited"}`);
 }
 
 export async function updateUser(userId: string, _prev: FormState, formData: FormData): Promise<FormState> {
@@ -153,6 +155,15 @@ export async function updateUser(userId: string, _prev: FormState, formData: For
     if (error) return failed(error);
   }
   return ok("Saved");
+}
+
+export async function resendInvitation(userId: string): Promise<FormState> {
+  await requireAccess(["admin"]);
+  const supabase = await createClient();
+  const { data: person } = await supabase.from("profiles").select("name, email, status").eq("id", userId).single();
+  if (person?.status !== "active") return { error: "Only active people can be invited." };
+  const result = await sendInvitation(person);
+  return result === "sent" ? ok(`Invitation sent to ${person.email}`) : { error: "The invitation could not be sent. Try again." };
 }
 
 /** Inactive: no sign-in (banned in Auth), no new monthly drafts; past invoices stay. */

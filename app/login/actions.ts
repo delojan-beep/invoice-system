@@ -22,6 +22,18 @@ export async function signInWithPassword(formData: FormData) {
   redirect("/");
 }
 
+export async function signInWithGoogle() {
+  const supabase = await createClient();
+  // Sign-ups are off, so only people an admin has added get through; Supabase
+  // joins the Google account to the person with the same email address.
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${publicEnv().APP_URL}/auth/confirm`, queryParams: { prompt: "select_account" } },
+  });
+  if (error || !data.url) redirect("/login?error=google");
+  redirect(data.url);
+}
+
 export async function sendEmailLink(formData: FormData) {
   const email = emailSchema.safeParse(formData.get("email"));
   if (!email.success) redirect("/login?mode=link&error=invalid");

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decideAccess, homePath, type ViewerState } from "./access";
+import { decideAccess, homePath, needsPasswordSetup, type ViewerState } from "./access";
 
 const employee: ViewerState = {
   signedIn: true,
@@ -7,6 +7,7 @@ const employee: ViewerState = {
   roles: ["employee"],
   aal: "aal1",
   hasVerifiedFactor: false,
+  needsPassword: false,
 };
 
 describe("decideAccess", () => {
@@ -17,6 +18,21 @@ describe("decideAccess", () => {
   it("blocks inactive users and users without roles", () => {
     expect(decideAccess({ ...employee, active: false })).toBe("inactive");
     expect(decideAccess({ ...employee, roles: [] })).toBe("inactive");
+  });
+
+  it("asks for a password after two-factor, before anything else", () => {
+    expect(decideAccess({ ...employee, needsPassword: true }, ["employee"])).toBe("set-password");
+    expect(decideAccess({ ...employee, roles: ["admin"], needsPassword: true })).toBe("enroll-mfa");
+    expect(decideAccess({ ...employee, roles: ["admin"], aal: "aal2", needsPassword: true })).toBe("set-password");
+  });
+
+  it("only asks people who arrived by email link", () => {
+    expect(needsPasswordSetup({ amr: [{ method: "otp" }] })).toBe(true);
+    expect(needsPasswordSetup({ amr: [{ method: "totp" }, { method: "magiclink" }] })).toBe(true);
+    expect(needsPasswordSetup({ amr: [{ method: "password" }] })).toBe(false);
+    expect(needsPasswordSetup({ amr: [{ method: "oauth" }] })).toBe(false);
+    expect(needsPasswordSetup({ amr: [{ method: "otp" }], user_metadata: { password_set: true } })).toBe(false);
+    expect(needsPasswordSetup({})).toBe(false);
   });
 
   it("lets employees in without two-factor", () => {

@@ -2,7 +2,8 @@
 
 import { startTransition, useActionState, type FormEvent } from "react";
 
-export type FormResult = { error?: string; message?: string };
+// `field` names the input an error belongs to, for forms that show it beside that input.
+export type FormResult = { error?: string; message?: string; field?: string };
 
 /**
  * useActionState for forms that must keep what people typed when the server

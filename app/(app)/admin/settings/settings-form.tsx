@@ -22,7 +22,7 @@ export type SettingsValues = {
 };
 
 const TEXTAREA =
-  "rounded-md border border-zinc-300 px-3 py-2 text-base text-zinc-900 focus:border-blue-600 focus:outline-none sm:text-sm";
+  "rounded-md border border-zinc-300 px-3 py-2 text-base text-zinc-900 focus:border-brand-600 focus:outline-none sm:text-sm";
 
 const WORDING: [string, string][] = [
   ["status_update", "Status emails to employees"],

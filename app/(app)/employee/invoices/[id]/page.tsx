@@ -74,7 +74,7 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/employee" className="text-sm text-blue-700 hover:underline">
+        <Link href="/employee" className="text-sm text-brand-700 hover:underline">
           ← My invoices
         </Link>
         <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -83,7 +83,7 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
           <p className="font-mono text-sm text-zinc-600">{invoice.number ?? "Number assigned when you submit"}</p>
-          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="text-sm font-medium text-blue-700 hover:underline">Download PDF</a>
+          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="text-sm font-medium text-brand-700 hover:underline">Download PDF</a>
         </div>
       </div>
 
@@ -246,7 +246,7 @@ function StatusNote({
       );
     case "submitted":
       return (
-        <p className={`${box} border-blue-200 bg-blue-50 text-blue-900`}>
+        <p className={`${box} border-brand-200 bg-brand-50 text-brand-900`}>
           {invoice.review_started_at
             ? "The CEO is reviewing it."
             : "Waiting for the CEO to review."}{" "}

@@ -51,7 +51,7 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
       )}
 
       <div>
-        <Link href={back} className="text-sm text-blue-700 hover:underline">
+        <Link href={back} className="text-sm text-brand-700 hover:underline">
           ← {back === "/accounts" ? "All invoices" : "Approvals"}
         </Link>
         <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -62,7 +62,7 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
           <p className="font-mono text-sm text-zinc-600">{invoice.number}</p>
-          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="text-sm font-medium text-blue-700 hover:underline">Download PDF</a>
+          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="text-sm font-medium text-brand-700 hover:underline">Download PDF</a>
         </div>
         <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-zinc-600">
           {invoice.submitted_at && <div>Submitted {formatDate(invoice.submitted_at, tz)}</div>}

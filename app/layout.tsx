@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,9 +12,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = { themeColor: "#2f2377" };
+
 export const metadata: Metadata = {
   title: "QNetwork Invoices",
   description: "Submit, approve and track QNetwork monthly invoices.",
+  icons: { icon: "/qnetwork-logo.webp" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

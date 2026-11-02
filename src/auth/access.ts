@@ -10,12 +10,25 @@ export type ViewerState = {
   roles: readonly AppRole[];
   aal: "aal1" | "aal2";
   hasVerifiedFactor: boolean;
+  needsPassword: boolean;
 };
 
-export type AccessDecision = "ok" | "login" | "inactive" | "enroll-mfa" | "verify-mfa" | "forbidden";
+export type AccessDecision = "ok" | "login" | "inactive" | "enroll-mfa" | "verify-mfa" | "set-password" | "forbidden";
 
 export function needsTwoFactor(roles: readonly AppRole[]) {
   return roles.some((r) => PRIVILEGED_ROLES.includes(r));
+}
+
+/**
+ * People who arrived by email link haven't chosen a password yet. Signing in
+ * with a password or Google shows they don't need this prompt.
+ */
+export function needsPasswordSetup(claims: { amr?: unknown; user_metadata?: unknown }) {
+  if ((claims.user_metadata as { password_set?: boolean } | undefined)?.password_set) return false;
+  const methods = (Array.isArray(claims.amr) ? claims.amr : []).map((m) =>
+    typeof m === "string" ? m : (m as { method?: string })?.method,
+  );
+  return methods.length > 0 && !methods.includes("password") && !methods.includes("oauth");
 }
 
 /**
@@ -29,6 +42,9 @@ export function decideAccess(viewer: ViewerState, anyOf: readonly AppRole[] = []
   if (needsTwoFactor(viewer.roles) && viewer.aal !== "aal2") {
     return viewer.hasVerifiedFactor ? "verify-mfa" : "enroll-mfa";
   }
+
+  // After two-factor: Auth refuses a password change from a session that still owes it.
+  if (viewer.needsPassword) return "set-password";
 
   if (anyOf.length > 0 && !anyOf.some((r) => viewer.roles.includes(r))) return "forbidden";
   return "ok";
