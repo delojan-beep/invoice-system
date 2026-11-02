@@ -22,7 +22,17 @@ export async function GET(request: NextRequest) {
   const target = request.nextUrl.clone();
   target.search = "";
   target.pathname = ok ? "/" : "/login";
-  // Google sends people back with an error when no one here has that address.
-  if (!ok) target.searchParams.set("error", searchParams.has("error") ? "google" : "link");
+  if (!ok) target.searchParams.set("error", signInError(searchParams));
   return NextResponse.redirect(target);
+}
+
+// Only "signup_disabled" means no one here has that Google address. Anything
+// else is a failed sign-in, not a verdict on the person's account.
+function signInError(params: URLSearchParams) {
+  if (!params.has("error")) return "link";
+  const code = params.get("error_code");
+  if (code === "signup_disabled") return "google";
+  // Only the code is logged: the description can quote Google's one-time code.
+  console.error("Google sign-in failed:", params.get("error"), code);
+  return "google-failed";
 }

@@ -30,7 +30,7 @@ export async function signInWithGoogle() {
     provider: "google",
     options: { redirectTo: `${publicEnv().APP_URL}/auth/confirm`, queryParams: { prompt: "select_account" } },
   });
-  if (error || !data.url) redirect("/login?error=google");
+  if (error || !data.url) redirect("/login?error=google-failed");
   redirect(data.url);
 }
 

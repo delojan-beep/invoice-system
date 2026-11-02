@@ -12,6 +12,7 @@ const ERRORS: Record<string, string> = {
   credentials: "That email and password don't match. Try again or use an email link.",
   link: "That sign-in link has expired or was already used. Request a new one.",
   google: "That Google account can't sign in here. Use the address your admin added, or ask them to add you.",
+  "google-failed": "Google sign-in didn't finish. Try again, or sign in with your password or an email link.",
   inactive: "Your account is inactive. Contact the admin if you need access.",
 };
 
