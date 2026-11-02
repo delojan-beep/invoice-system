@@ -1,12 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { homePath } from "@/src/auth/access";
 import { requirePasswordPageAccess } from "@/src/auth/dal";
 import { createClient } from "@/src/supabase/server";
 import type { FormResult } from "@/src/ui/use-form-action";
 
 export async function setPassword(_prev: FormResult, formData: FormData): Promise<FormResult> {
-  await requirePasswordPageAccess();
+  const viewer = await requirePasswordPageAccess();
 
   const password = String(formData.get("password") ?? "");
   const confirm = String(formData.get("confirm") ?? "");
@@ -29,5 +30,6 @@ export async function setPassword(_prev: FormResult, formData: FormData): Promis
 
   // The access token still says "password not set" until it is renewed.
   await supabase.auth.refreshSession();
-  redirect("/");
+  // Straight home, not via "/": after two-factor setup the browser may still remember "/" leading back here.
+  redirect(homePath(viewer.roles));
 }

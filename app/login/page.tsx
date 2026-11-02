@@ -46,7 +46,7 @@ export default async function LoginPage({
           <Field label="Email" name="email" type="email" autoComplete="email" required />
           <Field label="Password" name="password" type="password" autoComplete="current-password" required />
           <Button type="submit">Sign in</Button>
-          <Link href="/login?mode=link" className="text-sm text-brand-700 hover:underline">
+          <Link href="/login?mode=link" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
             Email me a sign-in link instead
           </Link>
         </form>
@@ -56,7 +56,7 @@ export default async function LoginPage({
             If that address belongs to an account, a sign-in link is on its way. It works once and expires in 24
             hours.
           </Notice>
-          <Link href="/login" className="text-sm text-brand-700 hover:underline">
+          <Link href="/login" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
             Back to password sign-in
           </Link>
         </div>
@@ -64,7 +64,7 @@ export default async function LoginPage({
         <form action={sendEmailLink} className="flex flex-col gap-4">
           <Field label="Email" name="email" type="email" autoComplete="email" required />
           <Button type="submit">Email me a link</Button>
-          <Link href="/login" className="text-sm text-brand-700 hover:underline">
+          <Link href="/login" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
             Sign in with a password instead
           </Link>
         </form>
