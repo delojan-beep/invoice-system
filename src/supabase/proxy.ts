@@ -1,7 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/auth/confirm"];
+// /api/cron has no user session; it checks CRON_SECRET itself.
+const PUBLIC_PATHS = ["/login", "/auth/confirm", "/api/cron"];
 
 // Refreshes the Supabase session cookie on every request and sends signed-out
 // visitors to /login. This is an optimistic check only: every page and action
