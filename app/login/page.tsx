@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { googleSignInEnabled } from "@/src/env";
-import { sendEmailLink, signInWithGoogle, signInWithPassword } from "./actions";
+import { sendEmailLink, signInWithGoogle } from "./actions";
 import { GoogleButton } from "./google-button";
+import { PasswordForm } from "./password-form";
 import { AuthCard, Button, Field, Notice } from "@/src/ui/auth-card";
 
 // Waits for the access check on the server before rendering (see Cache Components docs).
@@ -9,7 +10,6 @@ export const instant = false;
 
 const ERRORS: Record<string, string> = {
   invalid: "Enter a valid email address and password.",
-  credentials: "That email and password don't match. Try again or use an email link.",
   link: "That sign-in link has expired or was already used. Request a new one.",
   google: "That Google account can't sign in here. Use the address your admin added, or ask them to add you.",
   "google-failed": "Google sign-in didn't finish. Try again, or sign in with your password or an email link.",
@@ -43,14 +43,7 @@ export default async function LoginPage({
       )}
 
       {mode === "password" ? (
-        <form action={signInWithPassword} className="flex flex-col gap-4">
-          <Field label="Email" name="email" type="email" autoComplete="email" required />
-          <Field label="Password" name="password" type="password" autoComplete="current-password" required />
-          <Button type="submit">Sign in</Button>
-          <Link href="/login?mode=link" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
-            Email me a sign-in link instead
-          </Link>
-        </form>
+        <PasswordForm />
       ) : params.sent ? (
         <div className="flex flex-col gap-4">
           <Notice tone="info">

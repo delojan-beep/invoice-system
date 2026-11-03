@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAccess } from "@/src/auth/dal";
-import { getReferenceLists, getUser, timezones } from "@/src/domain/admin-queries";
+import { getNextEmployeeCode, getReferenceLists, getUser, timezones } from "@/src/domain/admin-queries";
 import { ActionButton } from "@/src/ui/action-button";
 import { Card } from "@/src/ui/controls";
 import { resendInvitation, setUserStatus, updateUser } from "../../actions";
@@ -14,7 +14,7 @@ export default async function UserPage({ params, searchParams }: PageProps<"/adm
   const viewer = await requireAccess(["admin"]);
   const { id } = await params;
   const { created } = await searchParams;
-  const [user, lists] = await Promise.all([getUser(id), getReferenceLists()]);
+  const [user, lists, nextCode] = await Promise.all([getUser(id), getReferenceLists(), getNextEmployeeCode()]);
   if (!user) notFound();
 
   const currencies = lists.currencies.filter((c) => c.active || c.code === user.default_currency).map((c) => c.code);
@@ -45,6 +45,7 @@ export default async function UserPage({ params, searchParams }: PageProps<"/adm
           currencies={currencies}
           timezones={timezones()}
           submitLabel="Save"
+          nextCode={nextCode}
           initial={{
             name: user.name,
             email: user.email,

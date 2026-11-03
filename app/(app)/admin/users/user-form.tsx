@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { ROLES } from "@/src/auth/access";
 import { Btn, Input, Label, Message, Select } from "@/src/ui/controls";
 import { useFormAction } from "@/src/ui/use-form-action";
@@ -25,14 +26,17 @@ export function UserForm({
   currencies,
   timezones,
   submitLabel,
+  nextCode,
 }: {
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   initial: UserValues;
   currencies: string[];
   timezones: string[];
   submitLabel: string;
+  nextCode: string;
 }) {
   const [state, run, pending] = useFormAction(action);
+  const [isEmployee, setIsEmployee] = useState(initial.roles.includes("employee"));
 
   return (
     <form onSubmit={run} className="flex flex-col gap-4">
@@ -50,7 +54,14 @@ export function UserForm({
         <div className="flex flex-wrap gap-4">
           {ROLES.map((r) => (
             <label key={r} className="flex items-center gap-2 text-sm text-zinc-800">
-              <input type="checkbox" name="roles" value={r} defaultChecked={initial.roles.includes(r)} className="h-4 w-4" />
+              <input
+                type="checkbox"
+                name="roles"
+                value={r}
+                defaultChecked={initial.roles.includes(r)}
+                onChange={r === "employee" ? (event) => setIsEmployee(event.target.checked) : undefined}
+                className="h-4 w-4"
+              />
               {ROLE_LABELS[r]}
             </label>
           ))}
@@ -58,10 +69,14 @@ export function UserForm({
         <p className="text-xs text-zinc-500">Approver, accounts and admin must set up two-factor sign-in.</p>
       </fieldset>
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Label text="Employee code" hint="In invoice numbers, e.g. E014">
-          <Input name="employeeCode" defaultValue={initial.employeeCode} maxLength={10} className="uppercase" />
-        </Label>
+      <div className={`grid gap-3 ${isEmployee ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+        {isEmployee && (
+          <Label text="Employee code" hint="Given automatically. Used in their invoice numbers.">
+            <output className="flex min-h-11 items-center rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-base font-normal text-zinc-800 sm:text-sm">
+              {initial.employeeCode || nextCode}
+            </output>
+          </Label>
+        )}
         <Label text="Default currency">
           <Select name="defaultCurrency" defaultValue={initial.defaultCurrency}>
             <option value="">None</option>

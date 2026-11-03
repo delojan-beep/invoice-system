@@ -1,7 +1,8 @@
 "use client";
 
-import { Button, Field, Notice } from "@/src/ui/auth-card";
+import { Button, Notice } from "@/src/ui/auth-card";
 import { Message } from "@/src/ui/controls";
+import { PasswordField } from "@/src/ui/password-field";
 import { useFormAction } from "@/src/ui/use-form-action";
 import { setPassword } from "./actions";
 
@@ -10,13 +11,13 @@ export function PasswordForm() {
   const invalid = (field: string) => (state.field === field ? true : undefined);
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    // method="post" keeps the password out of the address if someone submits before the page's scripts load.
+    <form method="post" onSubmit={onSubmit} className="flex flex-col gap-4">
       {state.error && !state.field && <Notice tone="error">{state.error}</Notice>}
       <div className="flex flex-col gap-1">
-        <Field
+        <PasswordField
           label="New password"
           name="password"
-          type="password"
           autoComplete="new-password"
           aria-describedby="password-help"
           aria-invalid={invalid("password")}
@@ -29,10 +30,9 @@ export function PasswordForm() {
         {state.field === "password" && <Message error={state.error} />}
       </div>
       <div className="flex flex-col gap-1">
-        <Field
+        <PasswordField
           label="Confirm password"
           name="confirm"
-          type="password"
           autoComplete="new-password"
           aria-invalid={invalid("confirm")}
           required

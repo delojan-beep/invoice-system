@@ -1,4 +1,5 @@
 import "server-only";
+import { nextEmployeeCode } from "@/src/domain/employee-code";
 import { createClient } from "@/src/supabase/server";
 
 // Reads for the admin pages. Row-level security lets only admins (with
@@ -13,6 +14,13 @@ export async function listUsers() {
     .order("name");
   if (error) throw error;
   return data.map((u) => ({ ...u, roles: u.roles.map((r) => r.role) }));
+}
+
+export async function getNextEmployeeCode() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("profiles").select("employee_code").not("employee_code", "is", null);
+  if (error) throw error;
+  return nextEmployeeCode(data.map((p) => p.employee_code));
 }
 
 export async function getUser(id: string) {

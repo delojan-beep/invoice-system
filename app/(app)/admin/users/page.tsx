@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAccess } from "@/src/auth/dal";
 import { getReferenceLists, listUsers, timezones } from "@/src/domain/admin-queries";
+import { nextEmployeeCode } from "@/src/domain/employee-code";
 import { Card } from "@/src/ui/controls";
 import { createUser } from "../actions";
 import { UserForm } from "./user-form";
@@ -28,7 +29,9 @@ export default async function UsersPage() {
                 <span className="min-w-0">
                   <span className="block font-medium text-zinc-900">
                     {u.name}
-                    {u.employee_code && <span className="ml-2 font-mono text-xs text-zinc-500">{u.employee_code}</span>}
+                    {u.employee_code && u.roles.includes("employee") && (
+                      <span className="ml-2 font-mono text-xs text-zinc-500">{u.employee_code}</span>
+                    )}
                   </span>
                   <span className="block text-xs text-zinc-500">{u.email}</span>
                 </span>
@@ -50,6 +53,7 @@ export default async function UsersPage() {
           currencies={currencies}
           timezones={timezones()}
           submitLabel="Add person"
+          nextCode={nextEmployeeCode(users.map((u) => u.employee_code))}
           initial={{
             name: "",
             email: "",

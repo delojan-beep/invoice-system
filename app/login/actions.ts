@@ -4,19 +4,20 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { publicEnv } from "@/src/env";
 import { createClient } from "@/src/supabase/server";
+import type { FormResult } from "@/src/ui/use-form-action";
 
 const emailSchema = z.email();
 
-export async function signInWithPassword(formData: FormData) {
+export async function signInWithPassword(_prev: FormResult, formData: FormData): Promise<FormResult> {
   const email = emailSchema.safeParse(formData.get("email"));
   const password = formData.get("password");
   if (!email.success || typeof password !== "string" || password.length === 0) {
-    redirect("/login?error=invalid");
+    return { error: "Enter a valid email address and password." };
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email: email.data, password });
-  if (error) redirect("/login?error=credentials");
+  if (error) return { error: "That email and password don't match. Try again or use an email link." };
 
   // "/" sends the viewer on to two-factor or their home page.
   redirect("/");

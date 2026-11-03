@@ -37,20 +37,11 @@ const userSchema = z
     name: z.string().trim().min(1, "Add a name").max(200),
     email: z.email("Enter a valid email address").transform((e) => e.toLowerCase()),
     roles: z.array(z.enum(ROLES)).min(1, "Give at least one role"),
-    employeeCode: z
-      .string()
-      .trim()
-      .toUpperCase()
-      .regex(/^([A-Z0-9]{2,10})?$/, "Employee code: 2 to 10 letters or digits, e.g. E014"),
     defaultCurrency: z.string().regex(/^([A-Z]{3})?$/),
     timezone: z.string().refine((tz) => Intl.supportedValuesOf("timeZone").includes(tz), "Choose a timezone"),
     address: z.string().trim().max(500),
     nicOrTin: z.string().trim().max(50),
     wiseRef: z.string().trim().max(200),
-  })
-  .refine((u) => !u.roles.includes("employee") || u.employeeCode, {
-    path: ["employeeCode"],
-    error: "Employees need an employee code (it goes in their invoice numbers)",
   })
   .refine((u) => !u.roles.includes("employee") || u.defaultCurrency, {
     path: ["defaultCurrency"],
@@ -62,7 +53,6 @@ function readUser(formData: FormData) {
     name: formData.get("name"),
     email: formData.get("email"),
     roles: formData.getAll("roles"),
-    employeeCode: formData.get("employeeCode") ?? "",
     defaultCurrency: formData.get("defaultCurrency") ?? "",
     timezone: formData.get("timezone"),
     address: formData.get("address") ?? "",
@@ -75,7 +65,6 @@ function profileRow(u: z.output<typeof userSchema>) {
   return {
     name: u.name,
     email: u.email,
-    employee_code: u.employeeCode || null,
     default_currency: u.defaultCurrency || null,
     timezone: u.timezone,
     address: u.address || null,
@@ -85,7 +74,6 @@ function profileRow(u: z.output<typeof userSchema>) {
 }
 
 function friendly(message: string) {
-  if (message.includes("profiles_employee_code_key")) return "That employee code is already used";
   if (message.includes("profiles_email_key") || /already been registered|email_exists/i.test(message)) {
     return "Someone already has that email address";
   }
