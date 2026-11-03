@@ -1,9 +1,13 @@
 import "server-only";
 import { nextEmployeeCode } from "@/src/domain/employee-code";
+import { isUuid } from "@/src/domain/ids";
 import { createClient } from "@/src/supabase/server";
 
 // Reads for the admin pages. Row-level security lets only admins (with
 // two-factor) change these; staff can read them.
+
+// Can't be deleted: monthly drafts find their pre-filled fee line by this name.
+export const FEES_LINE_TYPE = "Professional fees";
 
 export async function listUsers() {
   const supabase = await createClient();
@@ -24,6 +28,7 @@ export async function getNextEmployeeCode() {
 }
 
 export async function getUser(id: string) {
+  if (!isUuid(id)) return null;
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("profiles")

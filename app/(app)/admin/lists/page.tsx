@@ -1,8 +1,8 @@
 import { requireAccess } from "@/src/auth/dal";
-import { getReferenceLists } from "@/src/domain/admin-queries";
+import { FEES_LINE_TYPE, getReferenceLists } from "@/src/domain/admin-queries";
 import { ActionButton } from "@/src/ui/action-button";
 import { Card } from "@/src/ui/controls";
-import { addCurrency, addLineType, addTaxRate, toggle } from "../actions";
+import { addCurrency, addLineType, addTaxRate, deleteLineType, toggle } from "../actions";
 import { AddForm, CurrencyFields, LineTypeFields, TaxFields } from "./forms";
 
 // Waits for the access check on the server before rendering (see Cache Components docs).
@@ -85,7 +85,7 @@ export default async function ListsPage() {
               <span className="text-sm text-zinc-900">
                 <span className="font-medium">{t.name}</span> · {t.receipt_required ? "receipt required" : "receipt optional"}
               </span>
-              <span className="flex items-center gap-3">
+              <span className="flex flex-wrap items-center gap-3">
                 <ActionButton
                   action={toggle.bind(null, { table: "line_types", key: t.id, field: "receipt_required", value: !t.receipt_required })}
                   label={t.receipt_required ? "Make receipt optional" : "Require receipt"}
@@ -97,6 +97,15 @@ export default async function ListsPage() {
                   label={t.active ? "Switch off" : "Switch on"}
                   variant="link"
                 />
+                {t.name !== FEES_LINE_TYPE && (
+                  <ActionButton
+                    action={deleteLineType.bind(null, t.id)}
+                    label="Delete"
+                    pendingLabel="Deleting…"
+                    variant="danger"
+                    confirmText={`Delete the line type "${t.name}"? This can't be undone.`}
+                  />
+                )}
               </span>
             </li>
           ))}

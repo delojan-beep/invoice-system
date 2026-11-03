@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ROLES } from "@/src/auth/access";
 import { requireAccess } from "@/src/auth/dal";
+import { FEES_LINE_TYPE } from "@/src/domain/admin-queries";
 import { sendInvitation } from "@/src/email/invite";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { toResult } from "@/src/domain/invoice-actions";
@@ -221,14 +222,29 @@ export async function addLineType(_prev: FormState, formData: FormData): Promise
   const parsed = lineTypeSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const supabase = await createClient();
-  const { count } = await supabase.from("line_types").select("id", { count: "exact", head: true });
+  const { data: last } = await supabase
+    .from("line_types")
+    .select("sort_order")
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   const { error } = await supabase.from("line_types").insert({
     name: parsed.data.name,
     receipt_required: parsed.data.receiptRequired === "on",
-    sort_order: (count ?? 0) + 1,
+    sort_order: (last?.sort_order ?? 0) + 1,
   });
   if (error?.code === "23505") return { error: "A line type with that name exists" };
   return error ? failed(error) : ok(`Added ${parsed.data.name}`);
+}
+
+/** Only for a line type no invoice uses: the database refuses the rest, so old invoices stay complete. */
+export async function deleteLineType(id: string): Promise<FormState> {
+  await requireAccess(["admin"]);
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("line_types").delete().eq("id", id).neq("name", FEES_LINE_TYPE).select("id");
+  if (error?.code === "23503") return { error: "Used on invoices, so it can't be deleted. Switch it off instead." };
+  if (error) return failed(error);
+  return data.length ? ok("Deleted") : { error: "This line type can't be deleted." };
 }
 
 type Toggle = { table: "currencies" | "tax_rates" | "line_types"; key: string; field: "active" | "receipt_required"; value: boolean };

@@ -23,45 +23,50 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   const mode = params.mode === "link" ? "link" : "password";
-  const error = params.error ?? params.reason;
+  const errorKey = params.error ?? params.reason;
+  const error = errorKey ? ERRORS[errorKey] : undefined;
+
+  const google = googleSignInEnabled() && !params.sent && (
+    <>
+      <form action={signInWithGoogle}>
+        <GoogleButton />
+      </form>
+      <div className="flex items-center gap-3 text-xs text-zinc-600">
+        <span className="h-px flex-1 bg-zinc-200" />
+        or
+        <span className="h-px flex-1 bg-zinc-200" />
+      </div>
+    </>
+  );
 
   return (
     <AuthCard title="Sign in to QNetwork Invoices">
-      {error && ERRORS[error] && <Notice tone="error">{ERRORS[error]}</Notice>}
-
-      {googleSignInEnabled() && !params.sent && (
-        <>
-          <form action={signInWithGoogle}>
-            <GoogleButton />
-          </form>
-          <div className="flex items-center gap-3 text-xs text-zinc-600">
-            <span className="h-px flex-1 bg-zinc-200" />
-            or
-            <span className="h-px flex-1 bg-zinc-200" />
-          </div>
-        </>
-      )}
-
       {mode === "password" ? (
-        <PasswordForm />
-      ) : params.sent ? (
-        <div className="flex flex-col gap-4">
-          <Notice tone="info">
-            If that address belongs to an account, a sign-in link is on its way. It works once and expires in 24
-            hours.
-          </Notice>
-          <Link href="/login" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
-            Back to password sign-in
-          </Link>
-        </div>
+        <PasswordForm earlierError={error}>{google}</PasswordForm>
       ) : (
-        <form action={sendEmailLink} className="flex flex-col gap-4">
-          <Field label="Email" name="email" type="email" autoComplete="email" required />
-          <Button type="submit">Email me a link</Button>
-          <Link href="/login" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
-            Sign in with a password instead
-          </Link>
-        </form>
+        <>
+          {error && <Notice tone="error">{error}</Notice>}
+          {google}
+          {params.sent ? (
+            <div className="flex flex-col gap-4">
+              <Notice tone="info">
+                If that address belongs to an account, a sign-in link is on its way. It works once and expires in 24
+                hours.
+              </Notice>
+              <Link href="/login" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
+                Back to password sign-in
+              </Link>
+            </div>
+          ) : (
+            <form action={sendEmailLink} className="flex flex-col gap-4">
+              <Field label="Email" name="email" type="email" autoComplete="email" required />
+              <Button type="submit">Email me a link</Button>
+              <Link href="/login" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
+                Sign in with a password instead
+              </Link>
+            </form>
+          )}
+        </>
       )}
     </AuthCard>
   );

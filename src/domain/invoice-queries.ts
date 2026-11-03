@@ -1,4 +1,5 @@
 import "server-only";
+import { isUuid } from "@/src/domain/ids";
 import { createClient } from "@/src/supabase/server";
 
 // Reads for invoice pages. Row-level security decides what each viewer sees,
@@ -18,6 +19,7 @@ export async function listMyInvoices(employeeId: string) {
 }
 
 export async function getInvoice(invoiceId: string) {
+  if (!isUuid(invoiceId)) return null;
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("invoices")

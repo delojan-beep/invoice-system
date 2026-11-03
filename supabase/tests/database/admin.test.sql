@@ -2,7 +2,7 @@
 -- with two-factor can change settings and lists. Run with `pnpm test:db`.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(10);
+select plan(14);
 
 -- Shipped by migrations (production never runs seed.sql).
 select ok((select count(*) from public.currencies where code in ('LKR', 'CAD')) = 2, 'LKR and CAD exist');
@@ -62,6 +62,32 @@ select throws_ok(
 );
 reset role;
 select is((select active from public.tax_rates where name = 'VAT 18%'), false, 'an employee cannot switch a tax rate on');
+
+-- Deleting line types
+insert into public.line_types (name) values ('Unused type'), ('Used type');
+insert into public.invoices (id, employee_id, month, currency_code) values
+  ('00000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-0000000000e1', '2026-10-01', 'CAD');
+insert into public.line_items (invoice_id, line_type_id, description, rate_minor)
+select '00000000-0000-0000-0000-0000000000f1', id, 'Fees', 100 from public.line_types where name = 'Used type';
+
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000e1', 'aal1');
+delete from public.line_types where name = 'Unused type';
+reset role;
+select ok(exists (select 1 from public.line_types where name = 'Unused type'), 'an employee cannot delete a line type');
+
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000d1', 'aal1');
+delete from public.line_types where name = 'Unused type';
+reset role;
+select ok(exists (select 1 from public.line_types where name = 'Unused type'), 'an admin without two-factor cannot delete a line type');
+
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000d1', 'aal2');
+delete from public.line_types where name = 'Unused type';
+select throws_ok(
+  $$ delete from public.line_types where name = 'Used type' $$,
+  '23503', null, 'a line type on an invoice cannot be deleted'
+);
+reset role;
+select ok(not exists (select 1 from public.line_types where name = 'Unused type'), 'an admin with two-factor can delete an unused line type');
 
 -- People
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000a1', 'aal2');
