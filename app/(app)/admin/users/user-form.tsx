@@ -109,7 +109,7 @@ export function UserForm({
           />
         </Label>
         <div className="flex flex-col gap-3">
-          <Label text="NIC or TIN" hint="Printed on their invoice PDFs">
+          <Label text="NIC or passport" hint="Number printed on their invoice PDFs">
             <Input name="nicOrTin" defaultValue={initial.nicOrTin} maxLength={50} />
           </Label>
           <Label text="Wise recipient reference">

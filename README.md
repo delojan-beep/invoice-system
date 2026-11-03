@@ -82,7 +82,7 @@ curl -H "Authorization: Bearer $CRON_SECRET" "http://localhost:3000/api/cron?now
 
 ## Invoice PDFs and the Google Sheet backup
 
-- `/pdf/<invoice id>` returns the invoice PDF (owner and staff only): QNetwork's Business Number and address, the worker's name, address and NIC/TIN, lines and totals. Both invoice pages link to it, and the monthly summary attaches the month's PDFs.
+- `/pdf/<invoice id>` returns the invoice PDF (owner and staff only): QNetwork's Business Number and address, the worker's name, address and NIC or passport number, lines and totals. Both invoice pages link to it, and the monthly summary attaches the month's PDFs.
 - The `sheet_backup` job appends each approved invoice to the backup sheet once (`GOOGLE_SA_JSON`, `BACKUP_SHEET_ID`). Values are written as plain values, never formulas.
 
 ## Launch checklist
@@ -94,7 +94,7 @@ The admin overview (`/admin`) shows most of these live.
 3. **Vercel:** a scheduler that calls `/api/cron` every 15 minutes (see Scheduled jobs), environment variables from `.env.example` (no `MAILPIT_URL`), `APP_URL` set to the real domain.
 4. **Email:** verify the sending domain in Resend; set `RESEND_API_KEY` and `EMAIL_FROM`. Supabase sends the "Email me a link" messages itself, so also set Resend as its SMTP server (Auth → Emails → SMTP: `smtp.resend.com`, port 465, user `resend`, password = the API key), raise the email rate limit, and set the email OTP expiry to 86400 seconds (the emails promise 24 hours).
    **Google (optional):** create an OAuth client in Google Cloud with the redirect URI `https://<project>.supabase.co/auth/v1/callback`, turn on the Google provider in Supabase, then set `GOOGLE_SIGN_IN=on` in Vercel and redeploy.
-5. **Admin settings:** company Business Number and address, who pays Wise fees, then add every employee with their code, currency, address and NIC/TIN.
+5. **Admin settings:** company Business Number and address, who pays Wise fees, then add every employee with their currency, address and NIC or passport number (their code is given automatically).
 6. **Open decisions:** the exchange-rate provider (`FX_PROVIDER`), and the accountant's tax confirmation before switching any tax rate on.
 7. **Pilot:** admin, CEO and two or three employees for one monthly cycle; keep the Google Sheet as a read-only backup; retire it after a few months of matching records.
 

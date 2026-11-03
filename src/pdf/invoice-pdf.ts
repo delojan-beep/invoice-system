@@ -2,7 +2,7 @@ import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf
 
 // The invoice PDF. Sri Lankan banks ask for these details before accepting a
 // payment from abroad: QNetwork's Business Number and address, the worker's
-// name, address and NIC/TIN, and the invoice with its lines and totals.
+// name, address and NIC or passport number, and the invoice with its lines and totals.
 
 export type InvoicePdfData = {
   company: { name: string; businessNumber: string; address: string };
@@ -117,7 +117,7 @@ export async function renderInvoicePdf(data: InvoicePdfData): Promise<Uint8Array
   y -= 14;
   text(data.worker.name + (data.worker.code ? ` (${data.worker.code})` : ""), MARGIN, 11, bold);
   y -= 15;
-  block([data.worker.address ?? "Address not on file", data.worker.nicOrTin ? `NIC / TIN: ${data.worker.nicOrTin}` : "NIC / TIN not on file"], MARGIN, colWidth);
+  block([data.worker.address ?? "Address not on file", data.worker.nicOrTin ? `NIC / Passport: ${data.worker.nicOrTin}` : "NIC / passport not on file"], MARGIN, colWidth);
   const leftBottom = y;
 
   y = topY;
