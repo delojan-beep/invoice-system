@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { publicEnv } from "@/src/env";
+import { signInErrorMessage } from "@/src/auth/sign-in-error";
 import { createClient } from "@/src/supabase/server";
 import type { FormResult } from "@/src/ui/use-form-action";
 
@@ -17,7 +18,7 @@ export async function signInWithPassword(_prev: FormResult, formData: FormData):
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email: email.data, password });
-  if (error) return { error: "That email and password don't match. Try again or use an email link." };
+  if (error) return { error: signInErrorMessage(error) };
 
   // "/" sends the viewer on to two-factor or their home page.
   redirect("/");

@@ -92,16 +92,6 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
 
       <StatusNote invoice={invoice} tz={tz} rejection={lastRejection?.comment ?? null} received={received} />
 
-      <Card title="Details">
-        <DetailsForm
-          action={saveDetails.bind(null, invoice.id)}
-          editable={editable}
-          currency={invoice.currency_code}
-          currencies={options.currencies}
-          reference={invoice.employee_reference ?? ""}
-        />
-      </Card>
-
       <Card title="Lines">
         {invoice.lines.length === 0 ? (
           <p className="text-base text-ink-600">No lines yet.</p>
@@ -196,6 +186,18 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
           />
         </Card>
       )}
+
+      <Card title="Details">
+        <DetailsForm
+          action={saveDetails.bind(null, invoice.id)}
+          editable={editable}
+          currency={invoice.currency_code}
+          currencies={options.currencies}
+          reference={invoice.employee_reference ?? ""}
+          hasLines={invoice.lines.length > 0}
+          subtotalMinor={invoice.subtotal_minor}
+        />
+      </Card>
 
       <Card title="History">
         <ol className="flex flex-col gap-3">

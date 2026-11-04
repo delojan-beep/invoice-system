@@ -1,9 +1,11 @@
 "use client";
 
-import { createContext, useContext, useId, useState, type ComponentProps, type SubmitEvent } from "react";
+import { createContext, useContext, useId, useState, useSyncExternalStore, type ComponentProps, type SubmitEvent } from "react";
 
 type Field = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 type Errors = Record<string, string>;
+
+const noSubscribe = () => () => {};
 
 const FieldErrorsContext = createContext<{ errors: Errors; idPrefix: string; clear: (name: string) => void }>({
   errors: {},
@@ -11,11 +13,16 @@ const FieldErrorsContext = createContext<{ errors: Errors; idPrefix: string; cle
   clear: () => {},
 });
 
+/** The field's visible label: the first text in its <label>, before any hint or message. */
+function labelText(el: Field) {
+  return el.labels?.[0]?.childNodes[0]?.textContent?.trim() || "This field";
+}
+
 /** Plain-language message for a field the browser rejects. Set data-invalid-message to override. */
 function messageFor(el: Field): string {
   if (el.dataset.invalidMessage) return el.dataset.invalidMessage;
   const v = el.validity;
-  if (v.valueMissing) return el instanceof HTMLSelectElement ? "Choose an option." : "This field is required.";
+  if (v.valueMissing) return `${labelText(el)} is required.`;
   if (v.typeMismatch && el instanceof HTMLInputElement && el.type === "email") {
     return "Enter an email address, like name@example.com.";
   }
@@ -34,6 +41,8 @@ function messageFor(el: Field): string {
 export function CheckedForm({ onSubmit, children, ...props }: ComponentProps<"form">) {
   const [errors, setErrors] = useState<Errors>({});
   const idPrefix = useId();
+  // False on the server and until the page's scripts run, so the browser's own checks cover a very early submit.
+  const scriptsReady = useSyncExternalStore(noSubscribe, () => true, () => false);
 
   const clear = (name: string) =>
     setErrors((current) => {
@@ -62,7 +71,7 @@ export function CheckedForm({ onSubmit, children, ...props }: ComponentProps<"fo
   };
 
   return (
-    <form {...props} noValidate onSubmit={handleSubmit}>
+    <form {...props} noValidate={scriptsReady} onSubmit={handleSubmit}>
       <FieldErrorsContext.Provider value={{ errors, idPrefix, clear }}>{children}</FieldErrorsContext.Provider>
     </form>
   );

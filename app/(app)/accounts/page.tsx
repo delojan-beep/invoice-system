@@ -3,26 +3,29 @@ import { requireAccess } from "@/src/auth/dal";
 import { formatMonth } from "@/src/domain/format";
 import { isOverdue } from "@/src/domain/invoice";
 import { formatMoney } from "@/src/domain/money";
-import { listCurrencies, listEmployees, listInvoices } from "@/src/domain/staff-queries";
+import { listCurrencies, listEmployees, listInvoiceMonths, listInvoices } from "@/src/domain/staff-queries";
 import { Card, StatusBadge } from "@/src/ui/controls";
 import { filtersToQuery, parseFilters } from "./filters";
+import { FiltersForm } from "./filters-form";
 
 // Waits for the access check on the server before rendering (see Cache Components docs).
 export const instant = false;
 
-const SELECT =
-  "min-h-11 rounded-lg border border-ink-400 bg-white px-3 py-2 text-base text-ink-900 focus:border-brand-600 focus:outline-none";
-
 export default async function AccountsPage({ searchParams }: PageProps<"/accounts">) {
   await requireAccess(["accounts"]);
   const filters = parseFilters(await searchParams);
-  const [invoices, employees, currencies] = await Promise.all([listInvoices(filters), listEmployees(), listCurrencies()]);
+  const [invoices, unconfirmed, employees, currencies, months] = await Promise.all([
+    listInvoices(filters),
+    listInvoices({ status: "unconfirmed" }),
+    listEmployees(),
+    listCurrencies(),
+    listInvoiceMonths(),
+  ]);
 
   // Totals per currency: amounts are never converted silently.
   const totals = new Map<string, number>();
   for (const i of invoices) totals.set(i.currency!.code, (totals.get(i.currency!.code) ?? 0) + i.total_minor);
 
-  const months = [...new Set(invoices.map((i) => i.month.slice(0, 7)))];
   if (filters.month && !months.includes(filters.month)) months.unshift(filters.month);
   const query = filtersToQuery(filters);
 
@@ -38,55 +41,21 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
         </a>
       </div>
 
-      <form className="flex flex-wrap items-end gap-3 rounded-xl border border-ink-200 bg-white p-4">
-        <label className="flex flex-col gap-1 text-base font-medium text-ink-700">
-          Employee
-          <select name="employee" defaultValue={filters.employee ?? ""} className={SELECT}>
-            <option value="">Everyone</option>
-            {employees.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.name}
-                {e.employee_code ? ` (${e.employee_code})` : ""}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-base font-medium text-ink-700">
-          Month
-          <input type="month" name="month" defaultValue={filters.month ?? ""} className={SELECT} />
-        </label>
-        <label className="flex flex-col gap-1 text-base font-medium text-ink-700">
-          Currency
-          <select name="currency" defaultValue={filters.currency ?? ""} className={SELECT}>
-            <option value="">All</option>
-            {currencies.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.code}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-base font-medium text-ink-700">
-          Status
-          <select name="status" defaultValue={filters.status ?? ""} className={SELECT}>
-            <option value="">Any</option>
-            <option value="submitted">Submitted</option>
-            <option value="overdue">Overdue</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-            <option value="paid">Paid</option>
-            <option value="unconfirmed">Paid, not confirmed</option>
-          </select>
-        </label>
-        <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-700 px-4 py-2 text-base font-medium text-white hover:bg-brand-800">
-          Filter
-        </button>
-        {query && (
-          <Link href="/accounts" className="inline-flex min-h-11 items-center text-base text-brand-700 hover:underline">
-            Clear
-          </Link>
-        )}
-      </form>
+      {unconfirmed.length > 0 && filters.status !== "unconfirmed" && (
+        <Link
+          href="/accounts?status=unconfirmed"
+          className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-base text-amber-900 hover:underline"
+        >
+          {unconfirmed.length} paid invoice{unconfirmed.length === 1 ? "" : "s"} still need{unconfirmed.length === 1 ? "s" : ""} confirming against Wise →
+        </Link>
+      )}
+
+      <FiltersForm
+        filters={filters}
+        employees={employees}
+        months={months.map((m) => ({ value: m, label: formatMonth(m) }))}
+        currencies={currencies.map((c) => c.code)}
+      />
 
       <Card
         title={`${invoices.length} invoice${invoices.length === 1 ? "" : "s"}`}
@@ -101,36 +70,37 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
         {invoices.length === 0 ? (
           <p className="text-base text-ink-600">No invoices match these filters.</p>
         ) : (
-          <div className="-mx-4 overflow-x-auto sm:mx-0">
-            <table className="w-full min-w-[720px] text-left text-base">
-              <thead className="border-b border-ink-200 text-sm uppercase tracking-wide text-ink-600">
+          <div className="overflow-x-auto">
+            {/* Below 1024 px, where the table won't fit its card, each invoice stacks as name and total, then number, status and payment. Wider: a table. */}
+            <table className="w-full text-left text-base max-lg:block lg:min-w-[720px]">
+              <thead className="border-b border-ink-200 text-sm uppercase tracking-wide text-ink-600 max-lg:hidden">
                 <tr>
-                  <th className="px-4 py-2 font-medium sm:pl-0">Employee</th>
+                  <th className="px-4 py-2 font-medium lg:pl-0">Employee</th>
                   <th className="px-2 py-2 font-medium">Invoice</th>
                   <th className="px-2 py-2 font-medium">Status</th>
                   <th className="px-2 py-2 text-right font-medium">Total</th>
-                  <th className="px-4 py-2 font-medium sm:pr-0">Payment</th>
+                  <th className="px-4 py-2 font-medium lg:pr-0">Payment</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ink-100">
+              <tbody className="divide-y divide-ink-100 max-lg:block">
                 {invoices.map((i) => {
                   const payment = i.payments.at(-1);
                   return (
-                    <tr key={i.id} className="align-middle">
-                      <td className="px-4 py-3 sm:pl-0">
-                        <Link href={`/invoices/${i.id}?from=accounts`} className="-mb-2 inline-flex min-h-11 items-center whitespace-nowrap font-medium text-brand-700 hover:underline">
+                    <tr key={i.id} className="align-middle max-lg:grid max-lg:grid-cols-[minmax(0,1fr)_auto] max-lg:gap-x-4 max-lg:gap-y-1 max-lg:py-3">
+                      <td className="px-4 py-3 max-lg:p-0 lg:pl-0">
+                        <Link href={`/invoices/${i.id}?from=accounts`} className="inline-flex min-h-11 items-center font-medium lg:-mb-2 lg:whitespace-nowrap text-brand-700 hover:underline">
                           {i.employee?.name}
                         </Link>
                         <div className="text-sm text-ink-600">{formatMonth(i.month)}</div>
                       </td>
-                      <td className="whitespace-nowrap px-2 py-3 text-sm text-ink-700">{i.number}</td>
-                      <td className="px-2 py-3">
+                      <td className="whitespace-nowrap px-2 py-3 text-sm text-ink-700 max-lg:col-span-2 max-lg:p-0">{i.number}</td>
+                      <td className="px-2 py-3 max-lg:col-span-2 max-lg:p-0">
                         <StatusBadge status={i.status} overdue={isOverdue(i)} />
                       </td>
-                      <td className="px-2 py-3 text-right font-medium text-ink-900">
+                      <td className="px-2 py-3 text-right font-medium text-ink-900 max-lg:col-start-2 max-lg:row-start-1 max-lg:p-0 max-lg:pt-2.5">
                         {formatMoney(i.total_minor, i.currency!)}
                       </td>
-                      <td className="px-4 py-3 text-sm text-ink-600 sm:pr-0">
+                      <td className={`px-4 py-3 text-sm text-ink-600 max-lg:col-span-2 max-lg:p-0 lg:pr-0 ${i.status === "paid" ? "" : "max-lg:hidden"}`}>
                         {i.status !== "paid"
                           ? "—"
                           : `Marked by ${i.marked_paid_by === "employee" ? "employee" : "CEO"} · ${

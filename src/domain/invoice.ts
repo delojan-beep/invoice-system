@@ -11,7 +11,7 @@ export const STATUS_LABELS: Record<InvoiceStatus, string> = {
   draft: "Draft",
   submitted: "Submitted",
   approved: "Approved",
-  rejected: "Rejected",
+  rejected: "Sent back",
   paid: "Paid",
 };
 

@@ -14,7 +14,7 @@ export const ACTION_LABELS: Record<string, string> = {
   recall: "Recalled to draft",
   review_start: "Review started",
   approve: "Approved",
-  reject: "Rejected",
+  reject: "Sent back",
   mark_paid: "Marked paid",
   payment_confirm: "Payment confirmed against Wise",
 };

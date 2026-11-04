@@ -175,7 +175,7 @@ export function LineForm({
             Cancel
           </Btn>
         )}
-        <Message error={state.error} />
+        <Message error={state.error} message={values === EMPTY ? state.message : undefined} />
       </div>
     </form>
   );

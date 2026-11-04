@@ -74,7 +74,7 @@ export function ConfirmPaymentForm({
           <Input name="transferId" defaultValue={initial.transferId} required maxLength={100} />
         </Label>
         <Label text="Who paid the Wise fee">
-          <Select name="feePaidBy" defaultValue={defaultFeePaidBy ?? ""} required>
+          <Select name="feePaidBy" defaultValue={defaultFeePaidBy ?? ""} required data-invalid-message="Choose who paid the Wise fee.">
             <option value="" disabled>
               Choose…
             </option>
