@@ -15,34 +15,34 @@ export function InvoiceLines({ invoice }: { invoice: InvoiceDetail }) {
 
   return (
     <>
-      <ul className="divide-y divide-zinc-100">
+      <ul className="divide-y divide-ink-100">
         {invoice.lines.map((line) => {
           const missingReceipt = line.line_type?.receipt_required && line.attachments.length === 0;
           return (
             <li key={line.id} className="flex flex-col gap-2 py-3">
               <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
                 <div className="min-w-0">
-                  <p className="font-medium text-zinc-900">{line.description}</p>
-                  <p className="text-sm text-zinc-600">
+                  <p className="font-medium text-ink-900">{line.description}</p>
+                  <p className="text-base text-ink-600">
                     {line.line_type?.name} · {line.quantity} × {formatMoney(line.rate_minor, currency)}
                     {line.tax_rate && ` · ${line.tax_rate.label} ${line.tax_rate.percentage}%`}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-zinc-900">{formatMoney(line.line_total_minor, currency)}</p>
+                  <p className="font-medium text-ink-900">{formatMoney(line.line_total_minor, currency)}</p>
                   {line.tax_minor > 0 && (
-                    <p className="text-xs text-zinc-600">+ {formatMoney(line.tax_minor, currency)} tax</p>
+                    <p className="text-sm text-ink-600">+ {formatMoney(line.tax_minor, currency)} tax</p>
                   )}
                 </div>
               </div>
               {(line.attachments.length > 0 || missingReceipt) && (
-                <ul className="flex flex-col gap-1 text-sm">
+                <ul className="flex flex-col gap-1 text-base">
                   {line.attachments.map((a) => (
                     <li key={a.id} className="flex gap-3">
                       <a href={`/attachments/${a.id}`} target="_blank" rel="noopener" className="text-brand-700 hover:underline">
                         {a.file_name}
                       </a>
-                      <span className="text-zinc-600">{formatFileSize(a.size_bytes)}</span>
+                      <span className="text-ink-600">{formatFileSize(a.size_bytes)}</span>
                     </li>
                   ))}
                   {missingReceipt && <li className="text-amber-800">No receipt attached</li>}
@@ -53,20 +53,20 @@ export function InvoiceLines({ invoice }: { invoice: InvoiceDetail }) {
         })}
       </ul>
 
-      <dl className="mt-4 flex flex-col gap-1 border-t border-zinc-200 pt-4 text-sm">
+      <dl className="mt-4 flex flex-col gap-1 border-t border-ink-200 pt-4 text-base">
         <div className="flex justify-between">
-          <dt className="text-zinc-600">Subtotal</dt>
-          <dd className="text-zinc-900">{formatMoney(invoice.subtotal_minor, currency)}</dd>
+          <dt className="text-ink-600">Subtotal</dt>
+          <dd className="text-ink-900">{formatMoney(invoice.subtotal_minor, currency)}</dd>
         </div>
         {[...taxByRate].map(([label, amount]) => (
           <div key={label} className="flex justify-between">
-            <dt className="text-zinc-600">{label}</dt>
-            <dd className="text-zinc-900">{formatMoney(amount, currency)}</dd>
+            <dt className="text-ink-600">{label}</dt>
+            <dd className="text-ink-900">{formatMoney(amount, currency)}</dd>
           </div>
         ))}
-        <div className="flex justify-between text-base font-semibold">
-          <dt className="text-zinc-900">Total</dt>
-          <dd className="text-zinc-900">{formatMoney(invoice.total_minor, currency)}</dd>
+        <div className="flex justify-between text-lg font-medium">
+          <dt className="text-ink-900">Total</dt>
+          <dd className="text-ink-900">{formatMoney(invoice.total_minor, currency)}</dd>
         </div>
       </dl>
     </>

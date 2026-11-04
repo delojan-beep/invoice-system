@@ -32,6 +32,7 @@ export function RejectForm({ action }: { action: Action }) {
           rows={3}
           maxLength={2000}
           required
+          data-invalid-message="Say what needs fixing."
         />
       </Label>
       <div className="flex flex-wrap items-center gap-3">

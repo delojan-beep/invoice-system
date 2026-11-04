@@ -21,19 +21,19 @@ export default async function UserPage({ params, searchParams }: PageProps<"/adm
   const isSelf = user.id === viewer.id;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <div>
-        <Link href="/admin/users" className="text-sm text-brand-700 hover:underline">
+        <Link href="/admin/users" className="inline-flex min-h-11 items-center text-base text-brand-700 hover:underline">
           ← Users
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-zinc-900">{user.name}</h1>
+        <h1 className="mt-2 text-title font-medium text-ink-900">{user.name}</h1>
         {created === "1" && (
-          <p role="status" className="mt-2 text-sm text-green-700">
+          <p role="status" className="mt-2 text-base text-green-700">
             Added. An invitation is on its way to {user.email}.
           </p>
         )}
         {created === "not-invited" && (
-          <p role="alert" className="mt-2 text-sm text-red-700">
+          <p role="alert" className="mt-2 text-base text-red-700">
             Added, but the invitation could not be sent. Use &ldquo;Send invitation&rdquo; below to try again.
           </p>
         )}
@@ -63,7 +63,7 @@ export default async function UserPage({ params, searchParams }: PageProps<"/adm
       {user.status === "active" && !isSelf && (
         <Card title="Invitation">
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-zinc-600">
+            <p className="text-base text-ink-600">
               Emails a new sign-in link, in case the first one expired or got lost. The link replaces any earlier one.
             </p>
             <ActionButton action={resendInvitation.bind(null, user.id)} label="Send invitation" pendingLabel="Sending…" />
@@ -74,12 +74,12 @@ export default async function UserPage({ params, searchParams }: PageProps<"/adm
       <Card title="Status">
         {user.status === "active" ? (
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-zinc-600">
+            <p className="text-base text-ink-600">
               Active. Making someone inactive stops them signing in and stops new monthly drafts. Their past invoices stay,
               and an invoice they already submitted can still be approved and paid.
             </p>
             {isSelf ? (
-              <p className="text-sm text-zinc-600">You can&apos;t make yourself inactive.</p>
+              <p className="text-base text-ink-600">You can&apos;t make yourself inactive.</p>
             ) : (
               <ActionButton
                 action={setUserStatus.bind(null, user.id, "inactive")}
@@ -92,7 +92,7 @@ export default async function UserPage({ params, searchParams }: PageProps<"/adm
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-zinc-600">Inactive: cannot sign in, no new monthly drafts.</p>
+            <p className="text-base text-ink-600">Inactive: cannot sign in, no new monthly drafts.</p>
             <ActionButton
               action={setUserStatus.bind(null, user.id, "active")}
               label="Make active again"

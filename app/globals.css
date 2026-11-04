@@ -4,12 +4,15 @@
    text colour consistent when the OS prefers dark. */
 :root {
   color-scheme: light;
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f6fb;
+  --foreground: #17142b;
+  accent-color: var(--color-brand-700);
 }
 
-/* Brand palette sampled from the QNetwork "Q" logo: deep indigo + orange.
-   brand-* = indigo (primary actions, links, focus); accent-* = orange (highlights).
+/* "Ledger": amounts lead, colour is rare. Palette sampled from the QNetwork "Q" logo.
+   brand-* = indigo (primary actions, links, focus); accent-* = orange (active nav, sent-back status).
+   ink-* = neutrals tinted towards the indigo; 400 is the lightest that holds 3:1 on white
+   (use it for field borders), 600 the lightest for text.
    Orange is not used for text on white below accent-700 (contrast). */
 @theme {
   --color-brand-50: #f3f2fb;
@@ -23,6 +26,25 @@
   --color-accent-500: #f07a1a;
   --color-accent-600: #d4640a;
   --color-accent-700: #b04f05;
+
+  --color-ink-50: #f7f6fb;
+  --color-ink-100: #efedf6;
+  --color-ink-200: #e4e2ee;
+  --color-ink-300: #cfccdd;
+  --color-ink-400: #8a86a0;
+  --color-ink-500: #6f6b87;
+  --color-ink-600: #55516e;
+  --color-ink-700: #423e5a;
+  --color-ink-800: #2c2842;
+  --color-ink-900: #17142b;
+
+  /* Page titles and the big amount scale with the screen, not at breakpoints. */
+  --text-title: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+  --text-title--line-height: 1.15;
+  --text-title--letter-spacing: -0.02em;
+  --text-amount: clamp(2.25rem, 1.75rem + 2vw, 3rem);
+  --text-amount--line-height: 1.05;
+  --text-amount--letter-spacing: -0.03em;
 }
 
 @theme inline {
@@ -37,6 +59,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   line-height: 1.5;
+  /* Digits share one width everywhere, so amounts line up in lists and tables. */
+  font-variant-numeric: tabular-nums;
 }
 
 /* Visible keyboard focus everywhere; mouse clicks stay unringed. */
@@ -55,4 +79,3 @@ body {
     scroll-behavior: auto !important;
   }
 }
-

@@ -11,7 +11,7 @@ import { filtersToQuery, parseFilters } from "./filters";
 export const instant = false;
 
 const SELECT =
-  "rounded-md border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 focus:border-brand-600 focus:outline-none sm:text-sm";
+  "min-h-11 rounded-lg border border-ink-400 bg-white px-3 py-2 text-base text-ink-900 focus:border-brand-600 focus:outline-none";
 
 export default async function AccountsPage({ searchParams }: PageProps<"/accounts">) {
   await requireAccess(["accounts"]);
@@ -27,19 +27,19 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
   const query = filtersToQuery(filters);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-zinc-900">All invoices</h1>
+        <h1 className="text-title font-medium text-ink-900">All invoices</h1>
         <a
           href={`/accounts/export${query ? `?${query}` : ""}`}
-          className="inline-flex min-h-11 items-center justify-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg border border-ink-400 bg-white px-4 py-2 text-base font-medium text-ink-800 hover:bg-ink-50"
         >
           Export CSV
         </a>
       </div>
 
-      <form className="flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-white p-4">
-        <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
+      <form className="flex flex-wrap items-end gap-3 rounded-xl border border-ink-200 bg-white p-4">
+        <label className="flex flex-col gap-1 text-base font-medium text-ink-700">
           Employee
           <select name="employee" defaultValue={filters.employee ?? ""} className={SELECT}>
             <option value="">Everyone</option>
@@ -51,11 +51,11 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
+        <label className="flex flex-col gap-1 text-base font-medium text-ink-700">
           Month
           <input type="month" name="month" defaultValue={filters.month ?? ""} className={SELECT} />
         </label>
-        <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
+        <label className="flex flex-col gap-1 text-base font-medium text-ink-700">
           Currency
           <select name="currency" defaultValue={filters.currency ?? ""} className={SELECT}>
             <option value="">All</option>
@@ -66,7 +66,7 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
+        <label className="flex flex-col gap-1 text-base font-medium text-ink-700">
           Status
           <select name="status" defaultValue={filters.status ?? ""} className={SELECT}>
             <option value="">Any</option>
@@ -78,11 +78,11 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
             <option value="unconfirmed">Paid, not confirmed</option>
           </select>
         </label>
-        <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800">
+        <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-700 px-4 py-2 text-base font-medium text-white hover:bg-brand-800">
           Filter
         </button>
         {query && (
-          <Link href="/accounts" className="py-2 text-sm text-brand-700 hover:underline">
+          <Link href="/accounts" className="inline-flex min-h-11 items-center text-base text-brand-700 hover:underline">
             Clear
           </Link>
         )}
@@ -91,7 +91,7 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
       <Card
         title={`${invoices.length} invoice${invoices.length === 1 ? "" : "s"}`}
         actions={
-          <p className="text-sm text-zinc-600">
+          <p className="text-base text-ink-600">
             {[...totals]
               .map(([code, total]) => formatMoney(total, currencies.find((c) => c.code === code)!))
               .join(" · ")}
@@ -99,11 +99,11 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
         }
       >
         {invoices.length === 0 ? (
-          <p className="text-sm text-zinc-600">No invoices match these filters.</p>
+          <p className="text-base text-ink-600">No invoices match these filters.</p>
         ) : (
           <div className="-mx-4 overflow-x-auto sm:mx-0">
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="border-b border-zinc-200 text-xs uppercase tracking-wide text-zinc-600">
+            <table className="w-full min-w-[720px] text-left text-base">
+              <thead className="border-b border-ink-200 text-sm uppercase tracking-wide text-ink-600">
                 <tr>
                   <th className="px-4 py-2 font-medium sm:pl-0">Employee</th>
                   <th className="px-2 py-2 font-medium">Invoice</th>
@@ -112,25 +112,25 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
                   <th className="px-4 py-2 font-medium sm:pr-0">Payment</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-ink-100">
                 {invoices.map((i) => {
                   const payment = i.payments.at(-1);
                   return (
-                    <tr key={i.id} className="align-top">
+                    <tr key={i.id} className="align-middle">
                       <td className="px-4 py-3 sm:pl-0">
-                        <Link href={`/invoices/${i.id}?from=accounts`} className="font-medium text-brand-700 hover:underline">
+                        <Link href={`/invoices/${i.id}?from=accounts`} className="-mb-2 inline-flex min-h-11 items-center whitespace-nowrap font-medium text-brand-700 hover:underline">
                           {i.employee?.name}
                         </Link>
-                        <div className="text-xs text-zinc-600">{formatMonth(i.month)}</div>
+                        <div className="text-sm text-ink-600">{formatMonth(i.month)}</div>
                       </td>
-                      <td className="px-2 py-3 font-mono text-xs text-zinc-700">{i.number}</td>
+                      <td className="whitespace-nowrap px-2 py-3 text-sm text-ink-700">{i.number}</td>
                       <td className="px-2 py-3">
                         <StatusBadge status={i.status} overdue={isOverdue(i)} />
                       </td>
-                      <td className="px-2 py-3 text-right font-medium text-zinc-900">
+                      <td className="px-2 py-3 text-right font-medium text-ink-900">
                         {formatMoney(i.total_minor, i.currency!)}
                       </td>
-                      <td className="px-4 py-3 text-xs text-zinc-600 sm:pr-0">
+                      <td className="px-4 py-3 text-sm text-ink-600 sm:pr-0">
                         {i.status !== "paid"
                           ? "—"
                           : `Marked by ${i.marked_paid_by === "employee" ? "employee" : "CEO"} · ${

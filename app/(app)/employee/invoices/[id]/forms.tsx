@@ -69,13 +69,13 @@ export function SubmitForm({
   return (
     <CheckedForm onSubmit={run} className="flex flex-col gap-3">
       {blocked && (
-        <ul className="list-disc pl-5 text-sm text-amber-800">
+        <ul className="list-disc pl-5 text-base text-amber-800">
           {blockers.map((b) => (
             <li key={b}>{b}</li>
           ))}
         </ul>
       )}
-      <label className="flex min-h-11 items-start gap-3 py-2 text-sm text-zinc-800">
+      <label className="flex min-h-11 items-start gap-3 py-2 text-base text-ink-800">
         <input
           type="checkbox"
           name="confirmed"

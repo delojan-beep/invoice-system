@@ -15,30 +15,30 @@ export default async function UsersPage() {
   const currencies = lists.currencies.filter((c) => c.active).map((c) => c.code);
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-zinc-900">Users</h1>
+    <div className="flex flex-col gap-8">
+      <h1 className="text-title font-medium text-ink-900">Users</h1>
 
       <Card title={`${users.length} people`}>
-        <ul className="divide-y divide-zinc-100">
+        <ul className="divide-y divide-ink-100">
           {users.map((u) => (
             <li key={u.id}>
               <Link
                 href={`/admin/users/${u.id}`}
-                className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-3 hover:bg-zinc-50"
+                className="-mx-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 transition-colors duration-150 hover:bg-ink-50 sm:-mx-6 sm:px-6"
               >
                 <span className="min-w-0">
-                  <span className="block font-medium text-zinc-900">
+                  <span className="block font-medium text-ink-900">
                     {u.name}
                     {u.employee_code && u.roles.includes("employee") && (
-                      <span className="ml-2 font-mono text-xs text-zinc-600">{u.employee_code}</span>
+                      <span className="ml-2 font-mono text-sm text-ink-600">{u.employee_code}</span>
                     )}
                   </span>
-                  <span className="block text-xs text-zinc-600">{u.email}</span>
+                  <span className="block text-sm text-ink-600">{u.email}</span>
                 </span>
-                <span className="flex items-center gap-2 text-xs">
-                  <span className="text-zinc-600">{u.roles.join(", ")}</span>
+                <span className="flex items-center gap-2 text-sm">
+                  <span className="text-ink-600">{u.roles.join(", ")}</span>
                   {u.status === "inactive" && (
-                    <span className="rounded-full bg-zinc-200 px-2 py-0.5 font-medium text-zinc-700">Inactive</span>
+                    <span className="rounded-full bg-ink-200 px-2 py-0.5 font-medium text-ink-700">Inactive</span>
                   )}
                 </span>
               </Link>

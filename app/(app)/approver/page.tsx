@@ -31,10 +31,10 @@ export default async function ApproverPage() {
   const paying = toPay.map((i) => row(i, `Approved ${formatDate(i.approved_at!, tz)}`));
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Approvals</h1>
-        <p className="mt-1 text-sm text-zinc-600">
+        <h1 className="text-title font-medium text-ink-900">Approvals</h1>
+        <p className="mt-1 text-base text-ink-600">
           {toReview.length === 0 && paying.length === 0
             ? "Nothing to review or pay right now."
             : `${toReview.length} to review${overdue.length ? ` (${overdue.length} overdue)` : ""}, ${paying.length} approved and waiting for payment.`}
@@ -48,14 +48,14 @@ export default async function ApproverPage() {
             action={approveSelected}
             label="Approve selected"
             pendingLabel="Approving…"
-            confirmVerb="Approve"
+            confirmQuestion="Approve {n}?"
           />
         </Card>
       )}
 
       {paying.length > 0 && (
         <Card title="Approved, waiting for payment">
-          <p className="mb-3 text-sm text-zinc-600">
+          <p className="mb-3 text-base text-ink-600">
             Pay these in Wise. Marking them paid here is optional; employees can mark their own when the money arrives.
           </p>
           <QueueTable
@@ -63,7 +63,7 @@ export default async function ApproverPage() {
             action={markSelectedPaid}
             label="Mark selected paid"
             pendingLabel="Saving…"
-            confirmVerb="Mark as paid"
+            confirmQuestion="Mark {n} as paid?"
           />
         </Card>
       )}

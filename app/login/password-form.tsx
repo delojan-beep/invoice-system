@@ -26,7 +26,7 @@ export function PasswordForm({ earlierError, children }: { earlierError?: string
         <Button type="submit" disabled={pending}>
           {pending ? "Signing in…" : "Sign in"}
         </Button>
-        <Link href="/login?mode=link" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
+        <Link href="/login?mode=link" className="inline-flex min-h-11 items-center text-base text-brand-700 hover:underline">
           Email me a sign-in link instead
         </Link>
       </CheckedForm>

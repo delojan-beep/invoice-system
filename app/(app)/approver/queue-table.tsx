@@ -22,13 +22,13 @@ export function QueueTable({
   action,
   label,
   pendingLabel,
-  confirmVerb,
+  confirmQuestion,
 }: {
   rows: QueueRow[];
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   label: string; // shown with the ticked count: "Approve selected (3)"
   pendingLabel: string;
-  confirmVerb: string; // "Approve" or "Mark as paid"; the confirmation names the count
+  confirmQuestion: string; // {n} becomes the ticked count: "Approve {n}?" reads "Approve 3 invoices?"
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [state, run, pending] = useFormAction(async (prev: FormState, formData: FormData) => {
@@ -40,8 +40,7 @@ export function QueueTable({
   // A bulk money action: ask once, naming how many invoices it touches.
   const confirmBulk = (e: FormEvent<HTMLFormElement>) => {
     const n = selected.size;
-    const question = `${confirmVerb} ${n} invoice${n === 1 ? "" : "s"}?`;
-    if (!window.confirm(question)) {
+    if (!window.confirm(confirmQuestion.replace("{n}", `${n} invoice${n === 1 ? "" : "s"}`))) {
       e.preventDefault();
       return;
     }
@@ -60,10 +59,10 @@ export function QueueTable({
   return (
     <form onSubmit={confirmBulk} className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm text-zinc-700">
+        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-base text-ink-700">
           <input
             type="checkbox"
-            className="h-4 w-4"
+            className="size-5"
             checked={allTicked}
             onChange={() => setSelected(allTicked ? new Set() : new Set(rows.map((r) => r.id)))}
           />
@@ -75,28 +74,31 @@ export function QueueTable({
         <Message error={state.error} message={state.message} />
       </div>
 
-      <ul className="divide-y divide-zinc-100">
+      <ul className="divide-y divide-ink-100">
         {rows.map((r) => (
-          <li key={r.id} className="flex items-center gap-3 py-3">
-            <input
-              type="checkbox"
-              name="ids"
-              value={r.id}
-              aria-label={`Select ${r.employee}, ${r.month}`}
-              className="h-4 w-4 shrink-0"
-              checked={selected.has(r.id)}
-              onChange={() => toggle(r.id)}
-            />
+          <li key={r.id} className="flex items-center gap-1 py-3">
+            {/* The whole 44px square toggles the 20px box. */}
+            <label className="-my-1 flex size-11 shrink-0 cursor-pointer items-center justify-start">
+              <input
+                type="checkbox"
+                name="ids"
+                value={r.id}
+                aria-label={`Select ${r.employee}, ${r.month}`}
+                className="size-5"
+                checked={selected.has(r.id)}
+                onChange={() => toggle(r.id)}
+              />
+            </label>
             <Link href={`/invoices/${r.id}`} className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-1 hover:underline">
               <span className="min-w-0">
-                <span className="block font-medium text-zinc-900">
+                <span className="block font-medium text-ink-900">
                   {r.employee} · {r.month}
                 </span>
-                <span className="block font-mono text-xs text-zinc-600">{r.number}</span>
+                <span className="block text-sm text-ink-600">{r.number}</span>
               </span>
-              <span className="text-right">
-                <span className="block font-medium text-zinc-900">{r.total}</span>
-                <span className={`block text-xs ${r.urgent ? "font-medium text-red-700" : "text-zinc-600"}`}>{r.when}</span>
+              <span className="sm:text-right">
+                <span className="block font-medium text-ink-900">{r.total}</span>
+                <span className={`block text-sm ${r.urgent ? "font-medium text-red-700" : "text-ink-600"}`}>{r.when}</span>
               </span>
             </Link>
           </li>

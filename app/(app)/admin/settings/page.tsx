@@ -17,8 +17,8 @@ export default async function SettingsPage() {
   const company = (s.company ?? {}) as { name?: string; business_number?: string; address?: string };
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-zinc-900">Settings</h1>
+    <div className="flex flex-col gap-8">
+      <h1 className="text-title font-medium text-ink-900">Settings</h1>
       <Card>
         <SettingsForm
           action={saveSettings}

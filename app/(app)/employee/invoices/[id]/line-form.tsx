@@ -153,12 +153,12 @@ export function LineForm({
             </Select>
           </Label>
         )}
-        <div className="flex flex-col justify-end text-sm text-zinc-600">
-          <span className="text-xs">Amount</span>
-          <span className="py-2 font-medium text-zinc-900">
+        <div className="flex flex-col justify-end text-base text-ink-600">
+          <span className="text-sm">Amount</span>
+          <span className="py-2 font-medium text-ink-900">
             {preview ? formatMoney(preview.lineTotalMinor, currency) : "—"}
             {preview && preview.taxMinor > 0 && (
-              <span className="block text-xs font-normal text-zinc-600">
+              <span className="block text-sm font-normal text-ink-600">
                 + {formatMoney(preview.taxMinor, currency)} tax
               </span>
             )}

@@ -19,16 +19,16 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const areas = ROLES.filter((r) => viewer.roles.includes(r));
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 text-zinc-900">
+    <div className="flex min-h-screen flex-col bg-ink-50 text-ink-900">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-brand-800 focus:shadow"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-base focus:font-medium focus:text-brand-800 focus:shadow"
       >
         Skip to main content
       </a>
-      <header className="border-b border-zinc-200 bg-white">
+      <header className="border-b border-ink-200 bg-white">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-1 px-4 py-1">
-          <span className="flex items-center gap-2.5 py-2 font-semibold text-brand-900">
+          <span className="flex items-center gap-2.5 py-2 font-medium text-brand-900">
             <BrandLogo />
             QNetwork Invoices
           </span>
@@ -39,18 +39,18 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
               </NavLink>
             ))}
           </nav>
-          <div className="ml-auto flex items-center gap-3 text-sm text-zinc-600">
-            <span>{viewer.name || viewer.email}</span>
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-x-1 text-sm text-ink-600">
+            <span className="hidden px-3 sm:inline">{viewer.name || viewer.email}</span>
             <Link
               href="/set-password"
-              className="inline-flex min-h-11 items-center rounded-md px-3 text-zinc-700 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900"
+              className="inline-flex min-h-11 items-center rounded-lg px-3 text-ink-700 transition-colors duration-150 hover:bg-ink-100 hover:text-ink-900"
             >
               Change password
             </Link>
             <form action="/auth/signout" method="post">
               <button
                 type="submit"
-                className="inline-flex min-h-11 items-center rounded-md px-3 text-zinc-700 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900"
+                className="inline-flex min-h-11 items-center rounded-lg px-3 text-ink-700 transition-colors duration-150 hover:bg-ink-100 hover:text-ink-900"
               >
                 Sign out
               </button>

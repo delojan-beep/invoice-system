@@ -33,8 +33,8 @@ const WORDING: [string, string][] = [
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <fieldset className="flex min-w-0 flex-col gap-3 border-t border-zinc-200 pt-4 first:border-t-0 first:pt-0">
-      <legend className="pb-1 text-base font-semibold text-zinc-900">{title}</legend>
+    <fieldset className="flex min-w-0 flex-col gap-3 border-t border-ink-200 pt-4 first:border-t-0 first:pt-0">
+      <legend className="pb-1 text-lg font-medium text-ink-900">{title}</legend>
       {children}
     </fieldset>
   );
@@ -53,8 +53,8 @@ export function SettingsForm({
 }) {
   const [state, run, pending] = useFormAction(action);
   const check = (name: string, value: string, label: string, list: string[]) => (
-    <label key={value} className="flex items-center gap-2 text-sm text-zinc-800">
-      <input type="checkbox" name={name} value={value} defaultChecked={list.includes(value)} className="h-4 w-4" />
+    <label key={value} className="flex min-h-11 cursor-pointer items-center gap-3 text-base text-ink-800">
+      <input type="checkbox" name={name} value={value} defaultChecked={list.includes(value)} className="size-5" />
       {label}
     </label>
   );
@@ -103,7 +103,7 @@ export function SettingsForm({
           </Label>
         </div>
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-zinc-700">Monthly summary goes to</span>
+          <span className="text-base font-medium text-ink-700">Monthly summary goes to</span>
           <div className="flex flex-wrap gap-4">
             {check("summary_recipients", "approver", "CEO (approver)", initial.summaryRecipients)}
             {check("summary_recipients", "accounts", "Accounts", initial.summaryRecipients)}
@@ -111,7 +111,7 @@ export function SettingsForm({
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-zinc-700">Daily summary shows</span>
+          <span className="text-base font-medium text-ink-700">Daily summary shows</span>
           <div className="flex flex-wrap gap-4">
             {check("reminder_fields", "number", "Invoice number", initial.reminderFields)}
             {check("reminder_fields", "date", "Date", initial.reminderFields)}
@@ -145,7 +145,7 @@ export function SettingsForm({
       </Section>
 
       <Section title="Email wording">
-        <p className="text-sm text-zinc-600">Optional note added at the top of each kind of email.</p>
+        <p className="text-base text-ink-600">Optional note added at the top of each kind of email.</p>
         <div className="grid gap-3 sm:grid-cols-2">
           {WORDING.map(([key, label]) => (
             <Label key={key} text={label}>

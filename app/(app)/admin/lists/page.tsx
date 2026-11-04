@@ -10,7 +10,8 @@ export const instant = false;
 
 function OnOff({ on }: { on: boolean }) {
   return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${on ? "bg-emerald-50 text-emerald-800" : "bg-zinc-100 text-zinc-600"}`}>
+    <span className="inline-flex items-center gap-2 text-sm font-medium text-ink-700">
+      <span aria-hidden="true" className={`size-2 rounded-full ${on ? "bg-emerald-600" : "bg-ink-400"}`} />
       {on ? "On" : "Off"}
     </span>
   );
@@ -23,15 +24,15 @@ export default async function ListsPage() {
   const row = "flex flex-wrap items-center justify-between gap-3 py-3";
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-zinc-900">Currencies, tax and line types</h1>
+    <div className="flex flex-col gap-8">
+      <h1 className="text-title font-medium text-ink-900">Currencies, tax and line types</h1>
 
       <Card title="Currencies">
-        <p className="mb-2 text-sm text-zinc-600">An invoice uses one currency; amounts are never converted silently.</p>
-        <ul className="divide-y divide-zinc-100">
+        <p className="mb-2 text-base text-ink-600">An invoice uses one currency; amounts are never converted silently.</p>
+        <ul className="divide-y divide-ink-100">
           {currencies.map((c) => (
             <li key={c.code} className={row}>
-              <span className="text-sm text-zinc-900">
+              <span className="text-base text-ink-900">
                 <span className="font-mono font-medium">{c.code}</span> · {c.name} · {c.symbol} · {c.decimal_places} decimals
               </span>
               <span className="flex items-center gap-3">
@@ -51,14 +52,14 @@ export default async function ListsPage() {
       </Card>
 
       <Card title="Tax rates">
-        <p className="mb-2 text-sm text-zinc-600">
+        <p className="mb-2 text-base text-ink-600">
           Switch a rate on only once the accountant confirms it applies. Employees can pick active rates for invoices in
           that rate&apos;s currency.
         </p>
-        <ul className="divide-y divide-zinc-100">
+        <ul className="divide-y divide-ink-100">
           {taxRates.map((t) => (
             <li key={t.id} className={row}>
-              <span className="text-sm text-zinc-900">
+              <span className="text-base text-ink-900">
                 <span className="font-medium">{t.name}</span> · {t.percentage}% · shown as {t.label} · {t.currency_code}
               </span>
               <span className="flex items-center gap-3">
@@ -79,10 +80,10 @@ export default async function ListsPage() {
       </Card>
 
       <Card title="Line types">
-        <ul className="divide-y divide-zinc-100">
+        <ul className="divide-y divide-ink-100">
           {lineTypes.map((t) => (
             <li key={t.id} className={row}>
-              <span className="text-sm text-zinc-900">
+              <span className="text-base text-ink-900">
                 <span className="font-medium">{t.name}</span> · {t.receipt_required ? "receipt required" : "receipt optional"}
               </span>
               <span className="flex flex-wrap items-center gap-3">

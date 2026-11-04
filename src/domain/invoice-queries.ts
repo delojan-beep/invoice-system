@@ -11,7 +11,7 @@ export async function listMyInvoices(employeeId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("invoices")
-    .select(`id, number, month, status, total_minor, submitted_at, review_deadline, review_started_at, ${CURRENCY}`)
+    .select(`id, number, month, status, total_minor, submitted_at, paid_at, review_deadline, review_started_at, ${CURRENCY}`)
     .eq("employee_id", employeeId)
     .order("month", { ascending: false });
   if (error) throw error;
