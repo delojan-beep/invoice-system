@@ -3,8 +3,9 @@ import { createAdminClient } from "@/src/supabase/admin";
 import { getSettings } from "./data";
 
 // Daily exchange rates into the base currency (CAD), stored per day so each
-// invoice keeps the rate of its submission date. The provider is still to be
-// chosen; it is picked with FX_PROVIDER and nothing is fetched until it is set.
+// invoice keeps the rate of its submission date. Production uses ExchangeRate-API's
+// free feed, whose terms require the attribution link on the accounts page. It is
+// picked with FX_PROVIDER, and nothing is fetched until that is set.
 
 export type DailyRates = { date: string; source: string; toBase: Record<string, number> };
 

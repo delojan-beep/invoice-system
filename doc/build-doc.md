@@ -91,7 +91,7 @@ Secrets and infrastructure live in environment variables; every business rule th
 | `APP_URL` | Base URL used in email links | `http://localhost:3000` |
 | `CRON_SECRET` | Lets only Vercel Cron call the jobs route (M5) | random string, set in Vercel |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Resend email sending (M5) | sending address to confirm |
-| `FX_PROVIDER_URL`, `FX_API_KEY` | Daily exchange-rate fetch (M5) | provider not chosen yet |
+| `FX_PROVIDER` | Daily exchange-rate fetch (M5) | `open-er-api` (ExchangeRate-API's free feed, no key) |
 | `GOOGLE_SA_JSON`, `BACKUP_SHEET_ID` | Export to the Google Sheet backup (M6) | service account key |
 
 Seeded defaults: review period 10 days; daily summary 8:00 AM in the CEO's timezone; monthly summary on the 15th at 6:30 PM Asia/Colombo; base currency CAD; number format `QN-EMP-YYYY-MM-NNN`.

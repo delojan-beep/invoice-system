@@ -95,7 +95,8 @@ The admin overview (`/admin`) shows most of these live.
 4. **Email:** verify the sending domain in Resend; set `RESEND_API_KEY` and `EMAIL_FROM`. Supabase sends the "Email me a link" messages itself, so also set Resend as its SMTP server (Auth → Emails → SMTP: `smtp.resend.com`, port 465, user `resend`, password = the API key), raise the email rate limit, and set the email OTP expiry to 86400 seconds (the emails promise 24 hours).
    **Google (optional):** create an OAuth client in Google Cloud with the redirect URI `https://<project>.supabase.co/auth/v1/callback`, turn on the Google provider in Supabase, then set `GOOGLE_SIGN_IN=on` in Vercel and redeploy.
 5. **Admin settings:** company Business Number and address, who pays Wise fees, then add every employee with their currency, address and NIC or passport number (their code is given automatically).
-6. **Open decisions:** the exchange-rate provider (`FX_PROVIDER`), and the accountant's tax confirmation before switching any tax rate on.
+6. **Exchange rates:** set `FX_PROVIDER=open-er-api` in Vercel and redeploy. This is ExchangeRate-API's free daily feed and needs no key; its terms require the attribution link on `/accounts`. Rates start with the next scheduled run, and invoices submitted before the first rate have no CAD value.
+   **Open decision:** the accountant's tax confirmation before switching any tax rate on.
 7. **Pilot:** admin, CEO and two or three employees for one monthly cycle; keep the Google Sheet as a read-only backup; retire it after a few months of matching records.
 
 ## How people sign in

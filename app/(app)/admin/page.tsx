@@ -50,7 +50,7 @@ export default async function AdminPage() {
     {
       ok: Boolean(process.env.FX_PROVIDER),
       label: "Exchange-rate provider",
-      fix: "Choose a provider and set FX_PROVIDER. Until then reports have no CAD value.",
+      fix: "Set FX_PROVIDER=open-er-api in Vercel (ExchangeRate-API, no key needed). Until then reports have no CAD value.",
     },
     {
       ok: Boolean(process.env.GOOGLE_SA_JSON && process.env.BACKUP_SHEET_ID),

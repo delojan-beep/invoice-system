@@ -115,6 +115,14 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
           </div>
         )}
       </Card>
+
+      {/* Required by the terms of ExchangeRate-API's free feed. */}
+      <p className="text-sm text-ink-600">
+        CAD values in the export use daily exchange rates.{" "}
+        <a href="https://www.exchangerate-api.com" className="text-brand-700 underline">
+          Rates By Exchange Rate API
+        </a>
+      </p>
     </div>
   );
 }
