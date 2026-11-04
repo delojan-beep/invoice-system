@@ -1,3 +1,4 @@
+import { CheckedForm } from "@/src/ui/checked-form";
 import Link from "next/link";
 import { googleSignInEnabled } from "@/src/env";
 import { sendEmailLink, signInWithGoogle } from "./actions";
@@ -58,13 +59,13 @@ export default async function LoginPage({
               </Link>
             </div>
           ) : (
-            <form action={sendEmailLink} className="flex flex-col gap-4">
+            <CheckedForm action={sendEmailLink} className="flex flex-col gap-4">
               <Field label="Email" name="email" type="email" autoComplete="email" required />
               <Button type="submit">Email me a link</Button>
               <Link href="/login" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
                 Sign in with a password instead
               </Link>
-            </form>
+            </CheckedForm>
           )}
         </>
       )}

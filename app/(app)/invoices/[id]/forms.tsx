@@ -1,8 +1,9 @@
 "use client";
 
+import { CheckedForm } from "@/src/ui/checked-form";
 import { useEffect, useRef } from "react";
 import { useFormAction } from "@/src/ui/use-form-action";
-import { Btn, Input, Label, Message, Select } from "@/src/ui/controls";
+import { Btn, Input, Label, Message, Select, Textarea } from "@/src/ui/controls";
 import type { FormState } from "../actions";
 
 type Action = (prev: FormState, formData: FormData) => Promise<FormState>;
@@ -24,14 +25,13 @@ export function ReviewStarter({ start }: { start: () => Promise<void> }) {
 export function RejectForm({ action }: { action: Action }) {
   const [state, run, pending] = useFormAction(action, {});
   return (
-    <form onSubmit={run} className="flex flex-col gap-3">
+    <CheckedForm onSubmit={run} className="flex flex-col gap-3">
       <Label text="What needs fixing?" hint="The employee sees this comment">
-        <textarea
+        <Textarea
           name="comment"
           rows={3}
           maxLength={2000}
           required
-          className="rounded-md border border-zinc-300 px-3 py-2 text-base text-zinc-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 sm:text-sm"
         />
       </Label>
       <div className="flex flex-wrap items-center gap-3">
@@ -40,7 +40,7 @@ export function RejectForm({ action }: { action: Action }) {
         </Btn>
         <Message error={state.error} message={state.message} />
       </div>
-    </form>
+    </CheckedForm>
   );
 }
 
@@ -67,7 +67,7 @@ export function ConfirmPaymentForm({
   ));
 
   return (
-    <form onSubmit={run} className="flex flex-col gap-3">
+    <CheckedForm onSubmit={run} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
         <Label text="Wise transfer ID">
           <Input name="transferId" defaultValue={initial.transferId} required maxLength={100} />
@@ -114,6 +114,6 @@ export function ConfirmPaymentForm({
         </Btn>
         <Message error={state.error} message={state.message} />
       </div>
-    </form>
+    </CheckedForm>
   );
 }

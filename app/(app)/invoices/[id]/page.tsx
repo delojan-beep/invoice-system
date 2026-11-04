@@ -62,7 +62,7 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
           <p className="font-mono text-sm text-zinc-600">{invoice.number}</p>
-          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="text-sm font-medium text-brand-700 hover:underline">Download PDF</a>
+          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="inline-flex min-h-11 items-center text-sm font-medium text-brand-700 hover:underline">Download PDF</a>
         </div>
         <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-zinc-600">
           {invoice.submitted_at && <div>Submitted {formatDate(invoice.submitted_at, tz)}</div>}
@@ -95,6 +95,7 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
                 label={`Approve ${formatMoney(invoice.total_minor, currency)}`}
                 pendingLabel="Approving…"
                 variant="primary"
+                confirmText={`Approve ${formatMoney(invoice.total_minor, currency)} for ${invoice.employee?.name ?? "this employee"}? They are told straight away.`}
               />
             </div>
             <div className="border-t border-zinc-200 pt-4">
@@ -109,7 +110,13 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
           <p className="mb-3 text-sm text-zinc-600">
             Optional: mark it paid to clear it from your daily summary. The employee can also mark it when the money arrives.
           </p>
-          <ActionButton action={markPaid.bind(null, invoice.id)} label="Mark as paid" pendingLabel="Saving…" variant="primary" />
+          <ActionButton
+            action={markPaid.bind(null, invoice.id)}
+            label="Mark as paid"
+            pendingLabel="Saving…"
+            variant="primary"
+            confirmText="Mark this invoice as paid? Only do this once the money has gone out in Wise."
+          />
         </Card>
       )}
 
@@ -118,30 +125,30 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
           {payment?.confirmed_by_accounts_at ? (
             <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-zinc-500">Wise transfer</dt>
+                <dt className="text-zinc-600">Wise transfer</dt>
                 <dd className="font-mono text-zinc-900">{payment.wise_transfer_id}</dd>
               </div>
               <div>
-                <dt className="text-zinc-500">Confirmed by accounts</dt>
+                <dt className="text-zinc-600">Confirmed by accounts</dt>
                 <dd className="text-zinc-900">{formatDate(payment.confirmed_by_accounts_at, tz)}</dd>
               </div>
               <div>
-                <dt className="text-zinc-500">Sent</dt>
+                <dt className="text-zinc-600">Sent</dt>
                 <dd className="text-zinc-900">{money(payment.amount_sent_minor, payment.sent_currency)}</dd>
               </div>
               <div>
-                <dt className="text-zinc-500">Wise fee</dt>
+                <dt className="text-zinc-600">Wise fee</dt>
                 <dd className="text-zinc-900">
                   {money(payment.wise_fee_minor, payment.sent_currency)} ·{" "}
                   {payment.fee_paid_by === "deducted" ? "deducted from payment" : "company paid"}
                 </dd>
               </div>
               <div>
-                <dt className="text-zinc-500">Received</dt>
+                <dt className="text-zinc-600">Received</dt>
                 <dd className="text-zinc-900">{money(payment.amount_received_minor, payment.received_currency)}</dd>
               </div>
               <div>
-                <dt className="text-zinc-500">Actual rate</dt>
+                <dt className="text-zinc-600">Actual rate</dt>
                 <dd className="text-zinc-900">{payment.actual_exchange_rate ?? "—"}</dd>
               </div>
             </dl>
@@ -184,16 +191,16 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
             <li key={e.id} className="text-sm">
               <p className="text-zinc-900">
                 <span className="font-medium">{ACTION_LABELS[e.action] ?? e.action}</span>
-                <span className="text-zinc-500">
+                <span className="text-zinc-600">
                   {" "}
                   · {e.actor_id === viewer.id ? "You" : (e.actor?.name ?? "System")}
                 </span>
               </p>
               {e.comment && <p className="text-zinc-700">“{e.comment}”</p>}
               {e.system_note && (e.action.startsWith("attachment") || e.action === "payment_confirm") && (
-                <p className="text-zinc-500">{e.system_note}</p>
+                <p className="text-zinc-600">{e.system_note}</p>
               )}
-              <p className="text-xs text-zinc-500">{formatDateTime(e.created_at, tz)}</p>
+              <p className="text-xs text-zinc-600">{formatDateTime(e.created_at, tz)}</p>
             </li>
           ))}
         </ol>

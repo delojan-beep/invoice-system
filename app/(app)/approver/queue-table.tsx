@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useFormAction } from "@/src/ui/use-form-action";
 import { Btn, Message } from "@/src/ui/controls";
 import type { FormState } from "../invoices/actions";
@@ -22,11 +22,13 @@ export function QueueTable({
   action,
   label,
   pendingLabel,
+  confirmVerb,
 }: {
   rows: QueueRow[];
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   label: string; // shown with the ticked count: "Approve selected (3)"
   pendingLabel: string;
+  confirmVerb: string; // "Approve" or "Mark as paid"; the confirmation names the count
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [state, run, pending] = useFormAction(async (prev: FormState, formData: FormData) => {
@@ -34,6 +36,17 @@ export function QueueTable({
     if (!result.error) setSelected(new Set());
     return result;
   }, {});
+
+  // A bulk money action: ask once, naming how many invoices it touches.
+  const confirmBulk = (e: FormEvent<HTMLFormElement>) => {
+    const n = selected.size;
+    const question = `${confirmVerb} ${n} invoice${n === 1 ? "" : "s"}?`;
+    if (!window.confirm(question)) {
+      e.preventDefault();
+      return;
+    }
+    run(e);
+  };
 
   const allTicked = rows.length > 0 && rows.every((r) => selected.has(r.id));
   const toggle = (id: string) =>
@@ -45,7 +58,7 @@ export function QueueTable({
     });
 
   return (
-    <form onSubmit={run} className="flex flex-col gap-3">
+    <form onSubmit={confirmBulk} className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-sm text-zinc-700">
           <input
@@ -79,11 +92,11 @@ export function QueueTable({
                 <span className="block font-medium text-zinc-900">
                   {r.employee} · {r.month}
                 </span>
-                <span className="block font-mono text-xs text-zinc-500">{r.number}</span>
+                <span className="block font-mono text-xs text-zinc-600">{r.number}</span>
               </span>
               <span className="text-right">
                 <span className="block font-medium text-zinc-900">{r.total}</span>
-                <span className={`block text-xs ${r.urgent ? "font-medium text-red-700" : "text-zinc-500"}`}>{r.when}</span>
+                <span className={`block text-xs ${r.urgent ? "font-medium text-red-700" : "text-zinc-600"}`}>{r.when}</span>
               </span>
             </Link>
           </li>

@@ -81,7 +81,7 @@ export function LineItem({
       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
         <div className="min-w-0">
           <p className="font-medium text-zinc-900">{line.description}</p>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-zinc-600">
             {line.line_type?.name} · {line.quantity} × {formatMoney(line.rate_minor, currency)}
             {line.tax_rate && ` · ${line.tax_rate.label} ${line.tax_rate.percentage}%`}
           </p>
@@ -89,7 +89,7 @@ export function LineItem({
         <div className="text-right">
           <p className="font-medium text-zinc-900">{formatMoney(line.line_total_minor, currency)}</p>
           {line.tax_minor > 0 && (
-            <p className="text-xs text-zinc-500">+ {formatMoney(line.tax_minor, currency)} tax</p>
+            <p className="text-xs text-zinc-600">+ {formatMoney(line.tax_minor, currency)} tax</p>
           )}
         </div>
       </div>
@@ -101,7 +101,7 @@ export function LineItem({
               <a href={`/attachments/${a.id}`} target="_blank" rel="noopener" className="text-brand-700 hover:underline">
                 {a.file_name}
               </a>
-              <span className="text-zinc-500">{formatFileSize(a.size_bytes)}</span>
+              <span className="text-zinc-600">{formatFileSize(a.size_bytes)}</span>
               {editable && removeAttachment[a.id] && (
                 <ActionButton
                   action={removeAttachment[a.id]}

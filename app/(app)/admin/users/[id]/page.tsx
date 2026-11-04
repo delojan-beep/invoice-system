@@ -79,7 +79,7 @@ export default async function UserPage({ params, searchParams }: PageProps<"/adm
               and an invoice they already submitted can still be approved and paid.
             </p>
             {isSelf ? (
-              <p className="text-sm text-zinc-500">You can&apos;t make yourself inactive.</p>
+              <p className="text-sm text-zinc-600">You can&apos;t make yourself inactive.</p>
             ) : (
               <ActionButton
                 action={setUserStatus.bind(null, user.id, "inactive")}

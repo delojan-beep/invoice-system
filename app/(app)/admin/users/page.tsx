@@ -30,10 +30,10 @@ export default async function UsersPage() {
                   <span className="block font-medium text-zinc-900">
                     {u.name}
                     {u.employee_code && u.roles.includes("employee") && (
-                      <span className="ml-2 font-mono text-xs text-zinc-500">{u.employee_code}</span>
+                      <span className="ml-2 font-mono text-xs text-zinc-600">{u.employee_code}</span>
                     )}
                   </span>
-                  <span className="block text-xs text-zinc-500">{u.email}</span>
+                  <span className="block text-xs text-zinc-600">{u.email}</span>
                 </span>
                 <span className="flex items-center gap-2 text-xs">
                   <span className="text-zinc-600">{u.roles.join(", ")}</span>

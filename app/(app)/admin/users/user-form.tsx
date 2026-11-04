@@ -1,8 +1,9 @@
 "use client";
 
+import { CheckedForm } from "@/src/ui/checked-form";
 import { useState } from "react";
 import { ROLES } from "@/src/auth/access";
-import { Btn, Input, Label, Message, Select } from "@/src/ui/controls";
+import { Btn, Input, Label, Message, Select, Textarea } from "@/src/ui/controls";
 import { useFormAction } from "@/src/ui/use-form-action";
 import type { FormState } from "../actions";
 
@@ -39,7 +40,7 @@ export function UserForm({
   const [isEmployee, setIsEmployee] = useState(initial.roles.includes("employee"));
 
   return (
-    <form onSubmit={run} className="flex flex-col gap-4">
+    <CheckedForm onSubmit={run} className="flex flex-col gap-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <Label text="Name">
           <Input name="name" defaultValue={initial.name} required maxLength={200} />
@@ -66,7 +67,7 @@ export function UserForm({
             </label>
           ))}
         </div>
-        <p className="text-xs text-zinc-500">Approver, accounts and admin must set up two-factor sign-in.</p>
+        <p className="text-xs text-zinc-600">Approver, accounts and admin must set up two-factor sign-in.</p>
       </fieldset>
 
       <div className={`grid gap-3 ${isEmployee ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
@@ -100,12 +101,11 @@ export function UserForm({
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Label text="Address" hint="Printed on their invoice PDFs">
-          <textarea
+          <Textarea
             name="address"
             rows={2}
             defaultValue={initial.address}
             maxLength={500}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-base text-zinc-900 focus:border-brand-600 focus:outline-none sm:text-sm"
           />
         </Label>
         <div className="flex flex-col gap-3">
@@ -124,6 +124,6 @@ export function UserForm({
         </Btn>
         <Message error={state.error} message={state.message} />
       </div>
-    </form>
+    </CheckedForm>
   );
 }

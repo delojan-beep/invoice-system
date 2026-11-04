@@ -36,7 +36,7 @@ export default async function ApproverPage() {
         <h1 className="text-2xl font-semibold text-zinc-900">Approvals</h1>
         <p className="mt-1 text-sm text-zinc-600">
           {toReview.length === 0 && paying.length === 0
-            ? "Nothing waiting. Every invoice is paid."
+            ? "Nothing to review or pay right now."
             : `${toReview.length} to review${overdue.length ? ` (${overdue.length} overdue)` : ""}, ${paying.length} approved and waiting for payment.`}
         </p>
       </div>
@@ -48,6 +48,7 @@ export default async function ApproverPage() {
             action={approveSelected}
             label="Approve selected"
             pendingLabel="Approving…"
+            confirmVerb="Approve"
           />
         </Card>
       )}
@@ -62,6 +63,7 @@ export default async function ApproverPage() {
             action={markSelectedPaid}
             label="Mark selected paid"
             pendingLabel="Saving…"
+            confirmVerb="Mark as paid"
           />
         </Card>
       )}

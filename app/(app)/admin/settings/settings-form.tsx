@@ -1,6 +1,7 @@
 "use client";
 
-import { Btn, Input, Label, Message, Select } from "@/src/ui/controls";
+import { CheckedForm } from "@/src/ui/checked-form";
+import { Btn, Input, Label, Message, Select, Textarea } from "@/src/ui/controls";
 import { useFormAction } from "@/src/ui/use-form-action";
 import type { FormState } from "../actions";
 
@@ -21,8 +22,6 @@ export type SettingsValues = {
   wording: Record<string, string>;
 };
 
-const TEXTAREA =
-  "rounded-md border border-zinc-300 px-3 py-2 text-base text-zinc-900 focus:border-brand-600 focus:outline-none sm:text-sm";
 
 const WORDING: [string, string][] = [
   ["status_update", "Status emails to employees"],
@@ -61,7 +60,7 @@ export function SettingsForm({
   );
 
   return (
-    <form onSubmit={run} className="flex flex-col gap-6">
+    <CheckedForm onSubmit={run} className="flex flex-col gap-6">
       <Section title="Review and numbering">
         <div className="grid gap-3 sm:grid-cols-3">
           <Label text="Review period (days)" hint="From each submission">
@@ -141,7 +140,7 @@ export function SettingsForm({
           </Label>
         </div>
         <Label text="Company address">
-          <textarea name="company_address" rows={3} defaultValue={initial.companyAddress} maxLength={500} className={TEXTAREA} />
+          <Textarea name="company_address" rows={3} defaultValue={initial.companyAddress} maxLength={500} />
         </Label>
       </Section>
 
@@ -150,7 +149,7 @@ export function SettingsForm({
         <div className="grid gap-3 sm:grid-cols-2">
           {WORDING.map(([key, label]) => (
             <Label key={key} text={label}>
-              <textarea name={`wording_${key}`} rows={2} defaultValue={initial.wording[key] ?? ""} maxLength={1000} className={TEXTAREA} />
+              <Textarea name={`wording_${key}`} rows={2} defaultValue={initial.wording[key] ?? ""} maxLength={1000} />
             </Label>
           ))}
         </div>
@@ -162,6 +161,6 @@ export function SettingsForm({
         </Btn>
         <Message error={state.error} message={state.message} />
       </div>
-    </form>
+    </CheckedForm>
   );
 }

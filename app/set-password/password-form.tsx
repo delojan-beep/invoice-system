@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckedForm } from "@/src/ui/checked-form";
 import { Button, Notice } from "@/src/ui/auth-card";
 import { Message } from "@/src/ui/controls";
 import { PasswordField } from "@/src/ui/password-field";
@@ -12,7 +13,7 @@ export function PasswordForm() {
 
   return (
     // method="post" keeps the password out of the address if someone submits before the page's scripts load.
-    <form method="post" onSubmit={onSubmit} className="flex flex-col gap-4">
+    <CheckedForm method="post" onSubmit={onSubmit} className="flex flex-col gap-4">
       {state.error && !state.field && <Notice tone="error">{state.error}</Notice>}
       <div className="flex flex-col gap-1">
         <PasswordField
@@ -42,6 +43,6 @@ export function PasswordForm() {
       <Button type="submit" disabled={pending}>
         {pending ? "Saving…" : "Save password"}
       </Button>
-    </form>
+    </CheckedForm>
   );
 }

@@ -1,6 +1,9 @@
+"use client";
+
 import type { ComponentProps, ReactNode } from "react";
 import type { InvoiceStatus } from "@/src/domain/invoice";
 import { STATUS_LABELS } from "@/src/domain/invoice";
+import { FieldError, useFieldError } from "./checked-form";
 
 type Variant = "primary" | "secondary" | "danger" | "link";
 
@@ -17,22 +20,86 @@ export function Btn({ variant = "primary", className = "", ...props }: { variant
 
 const FIELD = "rounded-md border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 min-h-11 transition-colors duration-150 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/40 aria-[invalid=true]:border-red-600 sm:text-sm";
 
-export function Label({ text, hint, children }: { text: string; hint?: string; children: ReactNode }) {
+export function Label({
+  text,
+  hint,
+  error,
+  errorId,
+  children,
+}: {
+  text: string;
+  hint?: string;
+  error?: string;
+  errorId?: string;
+  children: ReactNode;
+}) {
   return (
     <label className="flex min-w-0 flex-col gap-1 text-sm font-medium text-zinc-700">
       {text}
       {children}
+      {error && (
+        <span id={errorId} className="flex items-start gap-1.5 text-sm font-normal text-red-700">
+          {error}
+        </span>
+      )}
       {hint && <span className="text-xs font-normal text-zinc-600">{hint}</span>}
     </label>
   );
 }
 
-export function Input(props: ComponentProps<"input">) {
-  return <input {...props} className={`${FIELD} ${props.className ?? ""}`} />;
+// Inside a CheckedForm, a field shows its own message right after it. Outside one, nothing changes.
+export function Input({ onChange, ...props }: ComponentProps<"input">) {
+  const field = useFieldError(props.name);
+  return (
+    <>
+      <input
+        {...props}
+        {...field.invalidProps}
+        onChange={(e) => {
+          field.clear();
+          onChange?.(e);
+        }}
+        className={`${FIELD} ${props.className ?? ""}`}
+      />
+      {field.message && field.id && <FieldError id={field.id} message={field.message} />}
+    </>
+  );
 }
 
-export function Select(props: ComponentProps<"select">) {
-  return <select {...props} className={`${FIELD} ${props.className ?? ""}`} />;
+export function Select({ onChange, ...props }: ComponentProps<"select">) {
+  const field = useFieldError(props.name);
+  return (
+    <>
+      <select
+        {...props}
+        {...field.invalidProps}
+        onChange={(e) => {
+          field.clear();
+          onChange?.(e);
+        }}
+        className={`${FIELD} ${props.className ?? ""}`}
+      />
+      {field.message && field.id && <FieldError id={field.id} message={field.message} />}
+    </>
+  );
+}
+
+export function Textarea({ onChange, ...props }: ComponentProps<"textarea">) {
+  const field = useFieldError(props.name);
+  return (
+    <>
+      <textarea
+        {...props}
+        {...field.invalidProps}
+        onChange={(e) => {
+          field.clear();
+          onChange?.(e);
+        }}
+        className={`${FIELD} ${props.className ?? ""}`}
+      />
+      {field.message && field.id && <FieldError id={field.id} message={field.message} />}
+    </>
+  );
 }
 
 export function Message({ error, message }: { error?: string; message?: string }) {

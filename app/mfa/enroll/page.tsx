@@ -41,7 +41,7 @@ export default async function EnrollPage() {
         <>
           {/* eslint-disable-next-line @next/next/no-img-element -- inline SVG data URL from Supabase */}
           <img src={enrolment.totp.qr_code} alt="QR code for your authenticator app" className="mx-auto h-48 w-48" />
-          <p className="break-all text-center font-mono text-xs text-zinc-500">{enrolment.totp.secret}</p>
+          <p className="break-all text-center font-mono text-xs text-zinc-600">{enrolment.totp.secret}</p>
           <CodeForm factorId={enrolment.id} submitLabel="Turn on two-factor" />
         </>
       )}

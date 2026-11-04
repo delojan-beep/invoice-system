@@ -66,7 +66,7 @@ export default async function EmployeePage() {
 
       <Card title="All invoices">
         {invoices.length === 0 ? (
-          <p className="text-sm text-zinc-500">No invoices yet.</p>
+          <p className="text-sm text-zinc-600">No invoices yet.</p>
         ) : (
           <ul className="divide-y divide-zinc-100">
             {invoices.map((i) => (
@@ -77,11 +77,11 @@ export default async function EmployeePage() {
                 >
                   <div className="min-w-0">
                     <p className="font-medium text-zinc-900">{formatMonth(i.month)}</p>
-                    <p className="font-mono text-xs text-zinc-500">{i.number ?? "Not submitted yet"}</p>
+                    <p className="font-mono text-xs text-zinc-600">{i.number ?? "Not submitted yet"}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     {i.submitted_at && (
-                      <span className="hidden text-xs text-zinc-500 sm:inline">
+                      <span className="text-xs text-zinc-600">
                         Submitted {formatDate(i.submitted_at, viewer.timezone)}
                       </span>
                     )}

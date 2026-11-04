@@ -74,7 +74,7 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/employee" className="text-sm text-brand-700 hover:underline">
+        <Link href="/employee" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
           ← My invoices
         </Link>
         <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -83,7 +83,7 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
           <p className="font-mono text-sm text-zinc-600">{invoice.number ?? "Number assigned when you submit"}</p>
-          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="text-sm font-medium text-brand-700 hover:underline">Download PDF</a>
+          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="inline-flex min-h-11 items-center text-sm font-medium text-brand-700 hover:underline">Download PDF</a>
         </div>
       </div>
 
@@ -101,7 +101,7 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
 
       <Card title="Lines">
         {invoice.lines.length === 0 ? (
-          <p className="text-sm text-zinc-500">No lines yet.</p>
+          <p className="text-sm text-zinc-600">No lines yet.</p>
         ) : (
           <ul className="divide-y divide-zinc-100">
             {invoice.lines.map((line) => (
@@ -200,15 +200,15 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
             <li key={e.id} className="text-sm">
               <p className="text-zinc-900">
                 <span className="font-medium">{ACTION_LABELS[e.action] ?? e.action}</span>
-                <span className="text-zinc-500"> · {actorLabel(e.actor_id, viewer.id, invoice.employee_id)}</span>
+                <span className="text-zinc-600"> · {actorLabel(e.actor_id, viewer.id, invoice.employee_id)}</span>
               </p>
               {e.comment && <p className="text-zinc-700">“{e.comment}”</p>}
               {e.system_note && e.action.startsWith("line") && (
                 // The note reads "<description>: <qty> x <rate> = <amount>" in minor units; show the description.
-                <p className="text-zinc-500">{e.system_note.slice(0, e.system_note.lastIndexOf(": "))}</p>
+                <p className="text-zinc-600">{e.system_note.slice(0, e.system_note.lastIndexOf(": "))}</p>
               )}
-              {e.system_note && e.action.startsWith("attachment") && <p className="text-zinc-500">{e.system_note}</p>}
-              <p className="text-xs text-zinc-500">{formatDateTime(e.created_at, tz)}</p>
+              {e.system_note && e.action.startsWith("attachment") && <p className="text-zinc-600">{e.system_note}</p>}
+              <p className="text-xs text-zinc-600">{formatDateTime(e.created_at, tz)}</p>
             </li>
           ))}
         </ol>

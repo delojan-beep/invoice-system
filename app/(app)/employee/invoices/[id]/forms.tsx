@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckedForm } from "@/src/ui/checked-form";
 import { useState } from "react";
 import { useFormAction } from "@/src/ui/use-form-action";
 import type { CurrencyInfo } from "@/src/domain/money";
@@ -24,7 +25,7 @@ export function DetailsForm({
 }) {
   const [state, run, pending] = useFormAction(action, {});
   return (
-    <form onSubmit={run} className="flex flex-col gap-3">
+    <CheckedForm onSubmit={run} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
         {editable && (
           <Label text="Currency" hint="Changing it removes tax rates set for the old currency">
@@ -47,7 +48,7 @@ export function DetailsForm({
         </Btn>
         <Message error={state.error} message={state.message} />
       </div>
-    </form>
+    </CheckedForm>
   );
 }
 
@@ -66,7 +67,7 @@ export function SubmitForm({
   const blocked = blockers.length > 0;
 
   return (
-    <form onSubmit={run} className="flex flex-col gap-3">
+    <CheckedForm onSubmit={run} className="flex flex-col gap-3">
       {blocked && (
         <ul className="list-disc pl-5 text-sm text-amber-800">
           {blockers.map((b) => (
@@ -74,11 +75,11 @@ export function SubmitForm({
           ))}
         </ul>
       )}
-      <label className="flex items-start gap-2 text-sm text-zinc-800">
+      <label className="flex min-h-11 items-start gap-3 py-2 text-sm text-zinc-800">
         <input
           type="checkbox"
           name="confirmed"
-          className="mt-0.5 h-4 w-4"
+          className="mt-0.5 size-5 shrink-0"
           checked={confirmed}
           onChange={(e) => setConfirmed(e.target.checked)}
         />
@@ -90,7 +91,7 @@ export function SubmitForm({
         </Btn>
         <Message error={state.error} message={state.message} />
       </div>
-    </form>
+    </CheckedForm>
   );
 }
 
@@ -106,7 +107,16 @@ export function MarkPaidForm({
 }) {
   const [state, run, pending] = useFormAction(action, {});
   return (
-    <form onSubmit={run} className="flex flex-col gap-3">
+    <CheckedForm
+      className="flex flex-col gap-3"
+      onSubmit={(e) => {
+        if (!window.confirm("Mark this invoice as paid? Only do this once the money has arrived.")) {
+          e.preventDefault();
+          return;
+        }
+        run(e);
+      }}
+    >
       <div className="grid grid-cols-2 gap-3 sm:max-w-md">
         <Label text="Amount received" hint="Optional">
           <Input name="amount" inputMode="decimal" placeholder="0.00" />
@@ -127,6 +137,6 @@ export function MarkPaidForm({
         </Btn>
         <Message error={state.error} message={state.message} />
       </div>
-    </form>
+    </CheckedForm>
   );
 }

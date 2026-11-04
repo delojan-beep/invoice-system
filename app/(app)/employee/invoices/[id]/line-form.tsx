@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useRef, useState, type FormEvent } from "react";
 import { useFormAction } from "@/src/ui/use-form-action";
 import { lineAmounts } from "@/src/domain/invoice";
 import { formatMoney, parseAmount, type CurrencyInfo } from "@/src/domain/money";
@@ -37,7 +37,14 @@ export function LineForm({
   onDone?: () => void;
 }) {
   const [values, setValues] = useState<LineFormValues>(initial ?? EMPTY);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof LineFormValues, string>>>({});
   const formRef = useRef<HTMLFormElement>(null);
+  const ids = useId();
+  const errorId = (key: keyof LineFormValues) => `${ids}-${key}-error`;
+  const describe = (key: keyof LineFormValues) => ({
+    "aria-invalid": fieldErrors[key] ? true : undefined,
+    "aria-describedby": fieldErrors[key] ? errorId(key) : undefined,
+  });
 
   const [state, run, pending] = useFormAction(async (prev: FormState, formData: FormData) => {
     const result = await action(prev, formData);
@@ -59,11 +66,34 @@ export function LineForm({
     quantity > 0 && rateMinor !== null ? lineAmounts(quantity, rateMinor, taxRate ? taxRate.percentage : null) : null;
   const needsReceipt = lineTypes.find((t) => t.id === values.lineTypeId)?.receipt_required;
 
+  // Checked here instead of by the browser, so each message sits beside its field.
+  const submit = (e: FormEvent<HTMLFormElement>) => {
+    const errors: Partial<Record<keyof LineFormValues, string>> = {};
+    if (!values.lineTypeId) errors.lineTypeId = "Choose a type.";
+    if (!values.description.trim()) errors.description = "Enter a description.";
+    if (!(quantity > 0)) errors.quantity = "Enter a quantity above zero.";
+    if (rateMinor === null) errors.rate = "Enter a rate, for example 1500.00.";
+    setFieldErrors(errors);
+
+    const first = Object.keys(errors)[0];
+    if (first) {
+      e.preventDefault();
+      formRef.current?.querySelector<HTMLElement>(`[name="${first}"]`)?.focus();
+      return;
+    }
+    run(e);
+  };
+
   return (
-    <form ref={formRef} onSubmit={run} className="flex flex-col gap-3">
+    <form ref={formRef} onSubmit={submit} noValidate className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
-        <Label text="Type" hint={needsReceipt ? "Needs a receipt before you submit" : undefined}>
-          <Select name="lineTypeId" value={values.lineTypeId} onChange={set("lineTypeId")} required>
+        <Label
+          text="Type"
+          hint={needsReceipt ? "Needs a receipt before you submit" : undefined}
+          error={fieldErrors.lineTypeId}
+          errorId={errorId("lineTypeId")}
+        >
+          <Select name="lineTypeId" value={values.lineTypeId} onChange={set("lineTypeId")} required {...describe("lineTypeId")}>
             <option value="" disabled>
               Choose…
             </option>
@@ -74,13 +104,20 @@ export function LineForm({
             ))}
           </Select>
         </Label>
-        <Label text="Description">
-          <Input name="description" value={values.description} onChange={set("description")} maxLength={500} required />
+        <Label text="Description" error={fieldErrors.description} errorId={errorId("description")}>
+          <Input
+            name="description"
+            value={values.description}
+            onChange={set("description")}
+            maxLength={500}
+            required
+            {...describe("description")}
+          />
         </Label>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Label text="Quantity">
+        <Label text="Quantity" error={fieldErrors.quantity} errorId={errorId("quantity")}>
           <Input
             name="quantity"
             type="number"
@@ -90,9 +127,10 @@ export function LineForm({
             value={values.quantity}
             onChange={set("quantity")}
             required
+            {...describe("quantity")}
           />
         </Label>
-        <Label text={`Rate (${currency.code})`}>
+        <Label text={`Rate (${currency.code})`} error={fieldErrors.rate} errorId={errorId("rate")}>
           <Input
             name="rate"
             inputMode="decimal"
@@ -100,6 +138,7 @@ export function LineForm({
             value={values.rate}
             onChange={set("rate")}
             required
+            {...describe("rate")}
           />
         </Label>
         {taxRates.length > 0 && (
@@ -119,7 +158,7 @@ export function LineForm({
           <span className="py-2 font-medium text-zinc-900">
             {preview ? formatMoney(preview.lineTotalMinor, currency) : "—"}
             {preview && preview.taxMinor > 0 && (
-              <span className="block text-xs font-normal text-zinc-500">
+              <span className="block text-xs font-normal text-zinc-600">
                 + {formatMoney(preview.taxMinor, currency)} tax
               </span>
             )}

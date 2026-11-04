@@ -99,11 +99,11 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
         }
       >
         {invoices.length === 0 ? (
-          <p className="text-sm text-zinc-500">No invoices match these filters.</p>
+          <p className="text-sm text-zinc-600">No invoices match these filters.</p>
         ) : (
           <div className="-mx-4 overflow-x-auto sm:mx-0">
             <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="border-b border-zinc-200 text-xs uppercase tracking-wide text-zinc-500">
+              <thead className="border-b border-zinc-200 text-xs uppercase tracking-wide text-zinc-600">
                 <tr>
                   <th className="px-4 py-2 font-medium sm:pl-0">Employee</th>
                   <th className="px-2 py-2 font-medium">Invoice</th>
@@ -121,7 +121,7 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
                         <Link href={`/invoices/${i.id}?from=accounts`} className="font-medium text-brand-700 hover:underline">
                           {i.employee?.name}
                         </Link>
-                        <div className="text-xs text-zinc-500">{formatMonth(i.month)}</div>
+                        <div className="text-xs text-zinc-600">{formatMonth(i.month)}</div>
                       </td>
                       <td className="px-2 py-3 font-mono text-xs text-zinc-700">{i.number}</td>
                       <td className="px-2 py-3">

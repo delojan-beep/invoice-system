@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckedForm } from "@/src/ui/checked-form";
 import type { ReactNode } from "react";
 import { Btn, Input, Label, Message, Select } from "@/src/ui/controls";
 import { useFormAction } from "@/src/ui/use-form-action";
@@ -11,7 +12,7 @@ type Action = (prev: FormState, formData: FormData) => Promise<FormState>;
 export function AddForm({ action, children, label }: { action: Action; children: ReactNode; label: string }) {
   const [state, run, pending] = useFormAction(action);
   return (
-    <form onSubmit={run} className="flex flex-col gap-3 border-t border-zinc-200 pt-4">
+    <CheckedForm onSubmit={run} className="flex flex-col gap-3 border-t border-zinc-200 pt-4">
       <div className="grid gap-3 sm:grid-cols-4">{children}</div>
       <div className="flex flex-wrap items-center gap-3">
         <Btn type="submit" variant="secondary" disabled={pending}>
@@ -19,7 +20,7 @@ export function AddForm({ action, children, label }: { action: Action; children:
         </Btn>
         <Message error={state.error} message={state.message} />
       </div>
-    </form>
+    </CheckedForm>
   );
 }
 
