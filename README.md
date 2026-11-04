@@ -1,6 +1,6 @@
-# QNetwork Invoice System
+# Invoice System
 
-Monthly invoicing for QNetwork: employees submit, the CEO approves, payment is recorded. See `doc/` for the PRD.
+Monthly invoicing: employees submit, the CEO approves, payment is recorded. See `doc/` for the PRD.
 
 Stack: Next.js 16 on Vercel, Supabase (Postgres, Auth with two-factor, Storage), Resend for email.
 

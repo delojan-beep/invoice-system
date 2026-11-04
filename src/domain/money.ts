@@ -21,6 +21,17 @@ export function formatMoney(minor: number, currency: CurrencyInfo): string {
 }
 
 /**
+ * An amount in minor units converted through base-currency rates (`toBase`: 1 of a currency in
+ * the base currency). Null when either rate is missing. The database does the real conversion.
+ */
+export function convertMinor(minor: number, from: CurrencyInfo, to: CurrencyInfo, toBase: Record<string, number>) {
+  const fromRate = toBase[from.code];
+  const toRate = toBase[to.code];
+  if (!fromRate || !toRate) return null;
+  return Math.round((minor / 10 ** from.decimal_places) * (fromRate / toRate) * 10 ** to.decimal_places);
+}
+
+/**
  * Reads an amount someone typed ("1,234.5") into minor units for a currency
  * with `places` decimal places. Returns null for anything that is not a
  * non-negative amount with at most that many decimals.

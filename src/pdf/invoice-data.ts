@@ -47,7 +47,7 @@ export async function loadInvoicePdfData(
 
   return {
     company: {
-      name: company.name || "QNetwork",
+      name: company.name || "Company name not set",
       businessNumber: company.business_number ?? "",
       address: company.address ?? "",
     },

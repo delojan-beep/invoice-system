@@ -35,7 +35,7 @@ export default async function SettingsPage() {
             invoiceNumberFormat: str(s.invoice_number_format, "QN-{EMP}-{YYYY}-{MM}-{NNN}"),
             baseCurrency: str(s.base_currency, "CAD"),
             wiseFeePayer: str(s.wise_fee_payer, ""),
-            companyName: company.name ?? "QNetwork",
+            companyName: company.name ?? "",
             companyBn: company.business_number ?? "",
             companyAddress: company.address ?? "",
             wording: (s.email_wording ?? {}) as Record<string, string>,

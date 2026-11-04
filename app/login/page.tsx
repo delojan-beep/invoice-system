@@ -15,6 +15,7 @@ const ERRORS: Record<string, string> = {
   google: "That Google account can't sign in here. Use the address your admin added, or ask them to add you.",
   "google-failed": "Google sign-in didn't finish. Try again, or sign in with your password or an email link.",
   inactive: "Your account is inactive. Contact the admin if you need access.",
+  unavailable: "Sign-in links can't be sent right now. Try again in a few minutes, or use your password.",
 };
 
 export default async function LoginPage({
@@ -41,7 +42,7 @@ export default async function LoginPage({
   );
 
   return (
-    <AuthCard title="Sign in to QNetwork Invoices">
+    <AuthCard title="Sign in">
       {mode === "password" ? (
         <PasswordForm earlierError={error}>{google}</PasswordForm>
       ) : (

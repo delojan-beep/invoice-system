@@ -25,7 +25,7 @@ export default async function EnrollPage() {
 
   const { data: enrolment, error: enrollError } = await supabase.auth.mfa.enroll({
     factorType: "totp",
-    issuer: "QNetwork Invoices",
+    issuer: "Invoices",
     friendlyName: `Authenticator ${new Date().toISOString()}`,
   });
 

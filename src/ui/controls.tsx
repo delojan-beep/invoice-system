@@ -8,9 +8,9 @@ import { AlertIcon, FieldError, useFieldError } from "./checked-form";
 type Variant = "primary" | "secondary" | "danger" | "link";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-700 px-4 py-2 text-base font-medium text-white transition-colors duration-150 hover:bg-brand-800 active:bg-brand-900",
-  secondary: "inline-flex min-h-11 items-center justify-center rounded-lg border border-ink-400 bg-white px-4 py-2 text-base font-medium text-ink-800 transition-colors duration-150 hover:bg-ink-50 active:bg-ink-100",
-  danger: "inline-flex min-h-11 items-center justify-center rounded-lg border border-red-300 bg-white px-4 py-2 text-base font-medium text-red-700 transition-colors duration-150 hover:bg-red-50 active:bg-red-100",
+  primary: "inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-700 px-4 py-2 text-base font-medium text-on-brand transition-colors duration-150 hover:bg-brand-800 active:bg-brand-900",
+  secondary: "inline-flex min-h-11 items-center justify-center rounded-lg border border-ink-400 bg-surface px-4 py-2 text-base font-medium text-ink-800 transition-colors duration-150 hover:bg-ink-50 active:bg-ink-100",
+  danger: "inline-flex min-h-11 items-center justify-center rounded-lg border border-red-300 bg-surface px-4 py-2 text-base font-medium text-red-700 transition-colors duration-150 hover:bg-red-50 active:bg-red-100",
   link: "inline-flex min-h-11 items-center rounded-sm text-base font-medium text-brand-700 hover:underline",
 };
 
@@ -18,7 +18,7 @@ export function Btn({ variant = "primary", className = "", ...props }: { variant
   return <button {...props} className={`${VARIANTS[variant]} disabled:cursor-not-allowed disabled:opacity-50 ${className}`} />;
 }
 
-const FIELD = "rounded-lg border border-ink-400 bg-white px-3 py-2 text-base text-ink-900 min-h-11 transition-colors duration-150 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/40 aria-[invalid=true]:border-red-600";
+const FIELD = "rounded-lg border border-ink-400 bg-surface px-3 py-2 text-base text-ink-900 min-h-11 transition-colors duration-150 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/40 aria-[invalid=true]:border-red-600";
 
 export function Label({
   text,
@@ -157,7 +157,7 @@ export function Card({ title, children, actions }: { title?: string; children: R
           {actions}
         </div>
       )}
-      <div className="rounded-xl border border-ink-200 bg-white p-4 sm:p-6">{children}</div>
+      <div className="rounded-xl border border-ink-200 bg-surface p-4 sm:p-6">{children}</div>
     </section>
   );
 }

@@ -57,7 +57,7 @@ export async function getAllSettings() {
   return Object.fromEntries(data.map((s) => [s.key, s.value])) as Record<string, unknown>;
 }
 
-/** IANA timezones for pickers, with the ones QNetwork uses first. */
+/** IANA timezones for pickers, with the ones used most first. */
 export function timezones() {
   const common = ["Asia/Colombo", "America/Toronto", "America/Vancouver"];
   return [...common, ...Intl.supportedValuesOf("timeZone").filter((z) => !common.includes(z))];

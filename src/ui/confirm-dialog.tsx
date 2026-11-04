@@ -71,7 +71,7 @@ function ConfirmDialog({
       onClick={(e) => {
         if (e.target === ref.current) ref.current?.close();
       }}
-      className="m-auto max-h-[85vh] w-[min(28rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-ink-200 bg-white p-0 text-ink-900 backdrop:bg-ink-900/50"
+      className="m-auto max-h-[85vh] w-[min(28rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-ink-200 bg-surface p-0 text-ink-900 backdrop:bg-black/50"
     >
       <div className="flex flex-col gap-3 p-6">
         <h2 id={`${id}-title`} className="text-xl font-medium tracking-tight text-brand-900">

@@ -1,14 +1,14 @@
 import type { ComponentProps, ReactNode } from "react";
-import { BrandLogo } from "./brand-logo";
 import { Btn, Input } from "./controls";
+import { ThemeToggle } from "./theme-toggle";
 
 export function AuthCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-ink-50 px-4 py-8 text-ink-900">
-      <div className="w-full max-w-sm rounded-xl border border-ink-200 bg-white p-6 shadow-sm">
-        <div className="mb-5 flex justify-center">
-          <BrandLogo size={56} alt="QNetwork" />
-        </div>
+    <main className="relative flex min-h-screen items-center justify-center bg-ink-50 px-4 py-8 text-ink-900">
+      <div className="absolute right-2 top-2">
+        <ThemeToggle />
+      </div>
+      <div className="w-full max-w-sm rounded-xl border border-ink-200 bg-surface p-6 shadow-sm">
         <h1 className="mb-6 text-center text-2xl font-medium tracking-tight text-brand-900">{title}</h1>
         <div className="flex flex-col gap-4">{children}</div>
       </div>

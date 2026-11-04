@@ -20,3 +20,12 @@ export function signInErrorMessage(error: SignInError): string {
   }
   return "Sign-in isn't working right now. This isn't your password. Try again in a few minutes.";
 }
+
+/**
+ * True only when the sign-in service itself failed. Any other refusal must get the usual
+ * "on its way" reply, so that the page never reveals whether an address has an account.
+ */
+export function emailLinkServiceDown(error: SignInError | null): boolean {
+  if (!error) return false;
+  return !error.status || error.status >= 500;
+}

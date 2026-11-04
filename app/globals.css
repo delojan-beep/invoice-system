@@ -9,8 +9,9 @@
   accent-color: var(--color-brand-700);
 }
 
-/* "Ledger": amounts lead, colour is rare. Palette sampled from the QNetwork "Q" logo.
+/* "Ledger": amounts lead, colour is rare.
    brand-* = indigo (primary actions, links, focus); accent-* = orange (active nav, sent-back status).
+   surface = cards and fields; on-brand = text on a primary button. Every colour has a dark value below.
    ink-* = neutrals tinted towards the indigo; 400 is the lightest that holds 3:1 on white
    (use it for field borders), 600 the lightest for text.
    Orange is not used for text on white below accent-700 (contrast). */
@@ -26,6 +27,9 @@
   --color-accent-500: #f07a1a;
   --color-accent-600: #d4640a;
   --color-accent-700: #b04f05;
+
+  --color-surface: #ffffff;
+  --color-on-brand: #ffffff;
 
   --color-ink-50: #f7f6fb;
   --color-ink-100: #efedf6;
@@ -61,6 +65,62 @@ body {
   line-height: 1.5;
   /* Digits share one width everywhere, so amounts line up in lists and tables. */
   font-variant-numeric: tabular-nums;
+}
+
+/* Dark theme. The token names stay the same, so components need no dark classes of their own. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #14121f;
+  --foreground: #f1f0f7;
+
+  --color-surface: #1d1a2b;
+  --color-on-brand: #17142b;
+
+  --color-ink-50: #14121f;
+  --color-ink-100: #272339;
+  --color-ink-200: #34304a;
+  --color-ink-300: #4a4566;
+  --color-ink-400: #8b87a3;
+  --color-ink-500: #a09cb8;
+  --color-ink-600: #b3afc8;
+  --color-ink-700: #c9c6da;
+  --color-ink-800: #dedcea;
+  --color-ink-900: #f1f0f7;
+
+  --color-brand-50: #241f3f;
+  --color-brand-100: #2e2850;
+  --color-brand-200: #443c73;
+  --color-brand-600: #b5aef0;
+  --color-brand-700: #c5bff5;
+  --color-brand-800: #d6d1f8;
+  --color-brand-900: #e6e3fb;
+
+  --color-accent-50: #33200f;
+  --color-accent-500: #f59a56;
+  --color-accent-600: #f0893b;
+  --color-accent-700: #f8b27e;
+
+  --color-amber-50: #2e2410;
+  --color-amber-200: #5c4a1c;
+  --color-amber-800: #f1c96f;
+  --color-amber-900: #f7dc9a;
+
+  --color-emerald-50: #10291f;
+  --color-emerald-200: #1f5240;
+  --color-emerald-600: #34c08f;
+  --color-emerald-800: #7fdcb9;
+  --color-emerald-900: #a8ebd0;
+
+  --color-green-700: #7fdcb9;
+  --color-green-800: #7fdcb9;
+
+  --color-red-50: #33161a;
+  --color-red-100: #451d22;
+  --color-red-200: #5e2a30;
+  --color-red-300: #b05a65;
+  --color-red-600: #f0707a;
+  --color-red-700: #f58b93;
+  --color-red-800: #f8a7ad;
 }
 
 /* Visible keyboard focus everywhere; mouse clicks stay unringed. */

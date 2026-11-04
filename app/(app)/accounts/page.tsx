@@ -35,7 +35,7 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
         <h1 className="text-title font-medium text-ink-900">All invoices</h1>
         <a
           href={`/accounts/export${query ? `?${query}` : ""}`}
-          className="inline-flex min-h-11 items-center justify-center rounded-lg border border-ink-400 bg-white px-4 py-2 text-base font-medium text-ink-800 hover:bg-ink-50"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg border border-ink-400 bg-surface px-4 py-2 text-base font-medium text-ink-800 hover:bg-ink-50"
         >
           Export CSV
         </a>
@@ -86,21 +86,21 @@ export default async function AccountsPage({ searchParams }: PageProps<"/account
                 {invoices.map((i) => {
                   const payment = i.payments.at(-1);
                   return (
-                    <tr key={i.id} className="align-middle max-lg:grid max-lg:grid-cols-[minmax(0,1fr)_auto] max-lg:gap-x-4 max-lg:gap-y-1 max-lg:py-3">
-                      <td className="px-4 py-3 max-lg:p-0 lg:pl-0">
+                    <tr key={i.id} className="align-middle max-lg:grid max-lg:grid-cols-[minmax(0,1fr)_auto] max-lg:gap-x-4 max-lg:gap-y-1 max-lg:py-3 sm:max-lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+                      <td className="px-4 py-3 max-lg:p-0 sm:max-lg:row-span-2 lg:pl-0">
                         <Link href={`/invoices/${i.id}?from=accounts`} className="inline-flex min-h-11 items-center font-medium lg:-mb-2 lg:whitespace-nowrap text-brand-700 hover:underline">
                           {i.employee?.name}
                         </Link>
                         <div className="text-sm text-ink-600">{formatMonth(i.month)}</div>
                       </td>
-                      <td className="whitespace-nowrap px-2 py-3 text-sm text-ink-700 max-lg:col-span-2 max-lg:p-0">{i.number}</td>
-                      <td className="px-2 py-3 max-lg:col-span-2 max-lg:p-0">
+                      <td className="whitespace-nowrap px-2 py-3 text-sm text-ink-700 max-lg:col-span-2 max-lg:p-0 sm:max-lg:col-span-1 sm:max-lg:col-start-2 sm:max-lg:row-start-1 sm:max-lg:pt-3">{i.number}</td>
+                      <td className="px-2 py-3 max-lg:col-span-2 max-lg:p-0 sm:max-lg:col-span-1 sm:max-lg:col-start-2 sm:max-lg:row-start-2">
                         <StatusBadge status={i.status} overdue={isOverdue(i)} />
                       </td>
-                      <td className="px-2 py-3 text-right font-medium text-ink-900 max-lg:col-start-2 max-lg:row-start-1 max-lg:p-0 max-lg:pt-2.5">
+                      <td className="px-2 py-3 text-right font-medium text-ink-900 max-lg:col-start-2 max-lg:row-start-1 max-lg:p-0 max-lg:pt-2.5 sm:max-lg:col-start-3">
                         {formatMoney(i.total_minor, i.currency!)}
                       </td>
-                      <td className={`px-4 py-3 text-sm text-ink-600 max-lg:col-span-2 max-lg:p-0 lg:pr-0 ${i.status === "paid" ? "" : "max-lg:hidden"}`}>
+                      <td className={`px-4 py-3 text-sm text-ink-600 max-lg:col-span-2 max-lg:p-0 sm:max-lg:col-start-2 sm:max-lg:row-start-3 lg:pr-0 ${i.status === "paid" ? "" : "max-lg:hidden"}`}>
                         {i.status !== "paid"
                           ? "—"
                           : `Marked by ${i.marked_paid_by === "employee" ? "employee" : "CEO"} · ${

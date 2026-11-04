@@ -33,7 +33,7 @@ export function withNote(email: Rendered, note: unknown): Rendered {
   return { ...email, html: email.html.replace("</h1>", `</h1>\n${para}`), text: `${text}\n\n${email.text}` };
 }
 
-function layout(heading: string, body: string, footer = "Sent by QNetwork Invoices.") {
+function layout(heading: string, body: string, footer = "Sent by your invoice system.") {
   return `<!doctype html><html><body style="margin:0;background:#f4f4f5;font-family:Arial,Helvetica,sans-serif;color:#18181b">
 <div style="max-width:640px;margin:0 auto;padding:24px">
 <div style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px">
@@ -54,15 +54,15 @@ export function invitation(input: { name: string; link: string; signInLink: stri
     : "";
   const googleText = input.google ? `\n\nIf this address is a Google account, you can also use Continue with Google: ${input.signInLink}` : "";
   return {
-    subject: "You've been invited to QNetwork Invoices",
+    subject: "You've been invited to the invoice system",
     html: layout(
-      "Welcome to QNetwork Invoices",
+      "Welcome to the invoice system",
       `<p style="margin:0 0 12px">Hi ${e(input.name)}, an account has been created for you. Use this button to sign in and set up your password.</p>
 ${button(input.link, "Sign in and set up your password")}
 <p style="margin:16px 0 0;font-size:14px;color:#52525b">The button works once and expires in 24 hours. If it has expired, choose &ldquo;Email me a sign-in link&rdquo; on the <a href="${e(input.signInLink)}" style="color:#1d4ed8">sign-in page</a>.</p>
 ${googleHtml}`,
     ),
-    text: `Hi ${input.name}, an account has been created for you on QNetwork Invoices.\n\nSign in and set up your password (works once, expires in 24 hours):\n${input.link}\n\nIf it has expired, ask for a new email link on the sign-in page: ${input.signInLink}${googleText}`,
+    text: `Hi ${input.name}, an account has been created for you on the invoice system.\n\nSign in and set up your password (works once, expires in 24 hours):\n${input.link}\n\nIf it has expired, ask for a new email link on the sign-in page: ${input.signInLink}${googleText}`,
   };
 }
 

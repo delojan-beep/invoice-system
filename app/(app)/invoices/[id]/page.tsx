@@ -92,6 +92,7 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
         <Card title="Review">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
+              <p className="text-base text-ink-600">Opening this invoice started the review, so the employee can no longer recall it.</p>
               <p className="text-base text-ink-600">Approving tells the employee; pay it in Wise straight after.</p>
               <ActionButton
                 action={approve.bind(null, invoice.id)}
@@ -200,7 +201,7 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
                 </span>
               </p>
               {e.comment && <p className="text-ink-700">“{e.comment}”</p>}
-              {e.system_note && (e.action.startsWith("attachment") || e.action === "payment_confirm") && (
+              {e.system_note && (e.action.startsWith("attachment") || e.action === "payment_confirm" || e.action === "currency_convert") && (
                 <p className="text-ink-600">{e.system_note}</p>
               )}
               <p className="text-sm text-ink-600">{formatDateTime(e.created_at, tz)}</p>

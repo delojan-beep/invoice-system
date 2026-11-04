@@ -43,6 +43,7 @@ export function QueueTable({
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const { guard, dialog } = useConfirmedSubmit();
+  const [nothingTicked, setNothingTicked] = useState(false);
   const [state, run, pending] = useFormAction(async (prev: FormState, formData: FormData) => {
     const result = await action(prev, formData);
     if (!result.error) setSelected(new Set());
@@ -53,6 +54,11 @@ export function QueueTable({
   const confirmBulk = (e: FormEvent<HTMLFormElement>) => {
     const picked = rows.filter((r) => selected.has(r.id));
     const n = picked.length;
+    setNothingTicked(n === 0);
+    if (n === 0) {
+      e.preventDefault();
+      return;
+    }
     // A non-breaking space keeps each symbol on the same line as its amount.
     const keepTogether = (money: string) => money.replace(" ", " ");
     const shown = picked.slice(0, 12).map((r) => `${r.employee}, ${r.month}: ${keepTogether(r.total)}`);
@@ -97,10 +103,10 @@ export function QueueTable({
           />
           Select all
         </label>
-        <Btn type="submit" disabled={pending || selected.size === 0}>
+        <Btn type="submit" disabled={pending}>
           {pending ? pendingLabel : selected.size ? `${label} (${selected.size})` : label}
         </Btn>
-        <Message error={state.error} message={state.message} />
+        <Message error={nothingTicked && selected.size === 0 ? "Tick at least one invoice first." : state.error} message={state.message} />
       </div>
 
       <ul className="divide-y divide-ink-100">

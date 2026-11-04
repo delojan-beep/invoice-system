@@ -8,7 +8,7 @@ export default function NotFound() {
       <p className="text-base text-ink-600">Check the link, or go back to your home page.</p>
       <Link
         href="/"
-        className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-700 px-4 py-2 text-base font-medium text-white transition-colors duration-150 hover:bg-brand-800"
+        className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-700 px-4 py-2 text-base font-medium text-on-brand transition-colors duration-150 hover:bg-brand-800"
       >
         Go to my home page
       </Link>

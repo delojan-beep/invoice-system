@@ -42,7 +42,7 @@ export function FiltersForm({
   };
 
   return (
-    <form className="flex flex-wrap items-end gap-3 rounded-xl border border-ink-200 bg-white p-4">
+    <form className="flex flex-wrap items-end gap-3 rounded-xl border border-ink-200 bg-surface p-4">
       <Label text="Employee">
         <Select name="employee" value={values.employee ?? ""} onChange={change("employee")}>
           <option value="">Everyone</option>
@@ -89,7 +89,7 @@ export function FiltersForm({
       <noscript>
         <button
           type="submit"
-          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-700 px-4 py-2 text-base font-medium text-white hover:bg-brand-800"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-700 px-4 py-2 text-base font-medium text-on-brand hover:bg-brand-800"
         >
           Filter
         </button>

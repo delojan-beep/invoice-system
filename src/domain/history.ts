@@ -3,6 +3,7 @@
 export const ACTION_LABELS: Record<string, string> = {
   create: "Draft created",
   update: "Details changed",
+  currency_convert: "Currency changed",
   reference: "My reference changed",
   line_add: "Line added",
   line_update: "Line changed",

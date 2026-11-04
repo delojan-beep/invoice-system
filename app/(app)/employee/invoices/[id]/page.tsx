@@ -4,7 +4,7 @@ import { requireAccess } from "@/src/auth/dal";
 import { formatDate, formatDateTime, formatMonth } from "@/src/domain/format";
 import { ACTION_LABELS, actorLabel } from "@/src/domain/history";
 import { allowedActions, isEditable, isOverdue } from "@/src/domain/invoice";
-import { getFormOptions, getInvoice, type InvoiceDetail } from "@/src/domain/invoice-queries";
+import { getConversionRates, getFormOptions, getInvoice, type InvoiceDetail } from "@/src/domain/invoice-queries";
 import { formatMoney } from "@/src/domain/money";
 import { ActionButton } from "@/src/ui/action-button";
 import { Card, StatusBadge } from "@/src/ui/controls";
@@ -32,7 +32,7 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
   const invoice = await getInvoice(id);
   if (!invoice || invoice.employee_id !== viewer.id || !invoice.currency) notFound();
 
-  const options = await getFormOptions(invoice.currency_code);
+  const [options, conversion] = await Promise.all([getFormOptions(invoice.currency_code), getConversionRates()]);
   const currency = invoice.currency;
   const tz = viewer.timezone;
   const editable = isEditable(invoice.status);
@@ -194,8 +194,9 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
           currency={invoice.currency_code}
           currencies={options.currencies}
           reference={invoice.employee_reference ?? ""}
-          hasLines={invoice.lines.length > 0}
-          subtotalMinor={invoice.subtotal_minor}
+          lines={invoice.lines.map((l) => ({ quantity: Number(l.quantity), rateMinor: l.rate_minor }))}
+          toBase={conversion.toBase}
+          ratesDate={conversion.date ? formatDate(`${conversion.date}T12:00:00Z`, "UTC") : null}
         />
       </Card>
 
@@ -212,7 +213,7 @@ export default async function InvoicePage({ params }: PageProps<"/employee/invoi
                 // The note reads "<description>: <qty> x <rate> = <amount>" in minor units; show the description.
                 <p className="text-ink-600">{e.system_note.slice(0, e.system_note.lastIndexOf(": "))}</p>
               )}
-              {e.system_note && e.action.startsWith("attachment") && <p className="text-ink-600">{e.system_note}</p>}
+              {e.system_note && (e.action.startsWith("attachment") || e.action === "currency_convert") && <p className="text-ink-600">{e.system_note}</p>}
               <p className="text-sm text-ink-600">{formatDateTime(e.created_at, tz)}</p>
             </li>
           ))}
@@ -237,7 +238,7 @@ function StatusNote({
   switch (invoice.status) {
     case "draft":
       return (
-        <p className={`${box} border-ink-200 bg-white text-ink-700`}>
+        <p className={`${box} border-ink-200 bg-surface text-ink-700`}>
           Add your lines during the month, then submit whenever suits you.
         </p>
       );

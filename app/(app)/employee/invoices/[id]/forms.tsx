@@ -4,7 +4,8 @@ import { CheckedForm } from "@/src/ui/checked-form";
 import { useState } from "react";
 import { useConfirmedSubmit } from "@/src/ui/confirm-dialog";
 import { useFormAction } from "@/src/ui/use-form-action";
-import { formatMoney, type CurrencyInfo } from "@/src/domain/money";
+import { lineAmounts } from "@/src/domain/invoice";
+import { convertMinor, formatMoney, type CurrencyInfo } from "@/src/domain/money";
 import { Btn, Input, Label, Message, Select } from "@/src/ui/controls";
 import type { FormState } from "./actions";
 
@@ -17,40 +18,50 @@ export function DetailsForm({
   currency,
   currencies,
   reference,
-  hasLines,
-  subtotalMinor,
+  lines,
+  toBase,
+  ratesDate,
 }: {
   action: Action;
   editable: boolean;
   currency: string;
   currencies: CurrencyInfo[];
   reference: string;
-  hasLines: boolean;
-  subtotalMinor: number;
+  lines: { quantity: number; rateMinor: number }[];
+  toBase: Record<string, number>;
+  ratesDate: string | null;
 }) {
   const [state, run, pending] = useFormAction(action, {});
   const [selected, setSelected] = useState(currency);
   const { guard, dialog } = useConfirmedSubmit();
 
-  // Lines store plain numbers, so a new currency relabels them instead of converting them.
+  // Lines are converted by the database. This previews its result, so it can be a cent out.
+  const current = currencies.find((c) => c.code === currency);
   const next = currencies.find((c) => c.code === selected);
-  const relabel =
-    hasLines && next && selected !== currency
-      ? `Amounts aren't converted, so the subtotal becomes ${formatMoney(subtotalMinor, next)}. Any tax rates are removed.`
-      : null;
+  const changing = lines.length > 0 && current && next && selected !== currency;
+  const converted = changing ? lines.map((l) => convertMinor(l.rateMinor, current, next, toBase)) : [];
+  const canConvert = changing && converted.every((rate) => rate !== null);
+  const subtotal = canConvert
+    ? lines.reduce((sum, l, i) => sum + lineAmounts(l.quantity, converted[i]!, null).lineTotalMinor, 0)
+    : 0;
+  const preview = !changing
+    ? null
+    : canConvert
+      ? `Line amounts are converted at 1 ${currency} = ${(toBase[currency] / toBase[selected]).toPrecision(4)} ${selected}${ratesDate ? ` (rates from ${ratesDate})` : ""}, so the subtotal becomes about ${formatMoney(subtotal, next)}. Any tax rates are removed.`
+      : `There's no exchange rate for ${selected} yet, so this invoice can't be converted. Try again tomorrow.`;
 
   return (
     <CheckedForm
       className="flex flex-col gap-3"
       onSubmit={(e) => {
-        const message = `Change this invoice from ${currency} to ${selected}?\n\n${relabel}`;
-        if (relabel && !guard(e, { message, confirmLabel: "Change currency" })) return;
+        const message = `Change this invoice from ${currency} to ${selected}?\n\n${preview}`;
+        if (canConvert && !guard(e, { message, confirmLabel: `Convert to ${selected}` })) return;
         run(e);
       }}
     >
       <div className="grid gap-3 sm:grid-cols-2">
         {editable && (
-          <Label text="Currency" hint={relabel ? undefined : "Amounts aren't converted when you change it. Any tax rates are removed."}>
+          <Label text="Currency" hint={preview ? undefined : "Changing it converts line amounts at the latest exchange rate. Any tax rates are removed."}>
             <Select name="currency" value={selected} onChange={(e) => setSelected(e.target.value)}>
               {currencies.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -64,9 +75,10 @@ export function DetailsForm({
           <Input name="reference" defaultValue={reference} maxLength={200} />
         </Label>
       </div>
-      {relabel && (
+      {preview && (
         <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-base text-amber-900">
-          {relabel} Check every line before you submit.
+          {preview}
+          {canConvert && " Check every line before you submit."}
         </p>
       )}
       <div className="flex items-center gap-3">

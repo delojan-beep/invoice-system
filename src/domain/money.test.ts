@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatMoney, parseAmount } from "./money";
+import { convertMinor, formatMoney, parseAmount } from "./money";
 
 const LKR = { code: "LKR", symbol: "Rs", decimal_places: 2 };
 const CAD = { code: "CAD", symbol: "$", decimal_places: 2 };
@@ -33,5 +33,29 @@ describe("parseAmount", () => {
     expect(parseAmount("1.234", 2)).toBeNull();
     expect(parseAmount("1.5", 0)).toBeNull();
     expect(parseAmount("1e5", 2)).toBeNull();
+  });
+});
+
+describe("convertMinor", () => {
+  const cad = { code: "CAD", symbol: "$", decimal_places: 2 };
+  const lkr = { code: "LKR", symbol: "Rs", decimal_places: 2 };
+  const jpy = { code: "JPY", symbol: "¥", decimal_places: 0 };
+  const toBase = { CAD: 1, LKR: 0.005, JPY: 0.01 };
+
+  it("converts in both directions through the base currency", () => {
+    expect(convertMinor(10000, cad, lkr, toBase)).toBe(2000000);
+    expect(convertMinor(2000000, lkr, cad, toBase)).toBe(10000);
+  });
+
+  it("converts between two currencies that are not the base", () => {
+    expect(convertMinor(100000, lkr, jpy, toBase)).toBe(500);
+  });
+
+  it("handles a currency with different decimal places", () => {
+    expect(convertMinor(500, jpy, cad, toBase)).toBe(500);
+  });
+
+  it("gives null when a rate is missing", () => {
+    expect(convertMinor(100, cad, { code: "TST", symbol: "T", decimal_places: 2 }, toBase)).toBeNull();
   });
 });

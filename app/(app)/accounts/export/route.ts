@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
   return new NextResponse(toCsv([header, ...rows]), {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="qnetwork-invoices-${filters.month ?? stamp}.csv"`,
+      "Content-Disposition": `attachment; filename="invoices-${filters.month ?? stamp}.csv"`,
       "Cache-Control": "no-store",
     },
   });

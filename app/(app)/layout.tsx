@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { rolePath, ROLES, type AppRole } from "@/src/auth/access";
 import { requireAccess } from "@/src/auth/dal";
-import { BrandLogo } from "@/src/ui/brand-logo";
 import { NavLink } from "@/src/ui/nav-link";
+import { ThemeToggle } from "@/src/ui/theme-toggle";
 
 // Waits for the access check on the server before rendering (see Cache Components docs).
 export const instant = false;
@@ -22,16 +22,13 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     <div className="flex min-h-screen flex-col bg-ink-50 text-ink-900">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-base focus:font-medium focus:text-brand-800 focus:shadow"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2 focus:text-base focus:font-medium focus:text-brand-800 focus:shadow"
       >
         Skip to main content
       </a>
-      <header className="border-b border-ink-200 bg-white">
+      <header className="border-b border-ink-200 bg-surface">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-1 px-4 py-1">
-          <span className="flex items-center gap-2.5 py-2 font-medium text-brand-900">
-            <BrandLogo />
-            QNetwork Invoices
-          </span>
+          <span className="py-2 font-medium text-brand-900">Invoices</span>
           <nav aria-label="Main" className="flex flex-wrap gap-4">
             {areas.map((role) => (
               <NavLink key={role} href={rolePath(role)}>
@@ -40,6 +37,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             ))}
           </nav>
           <div className="ml-auto flex flex-wrap items-center justify-end gap-x-1 text-sm text-ink-600">
+            <ThemeToggle />
             <span className="hidden px-3 sm:inline">{viewer.name || viewer.email}</span>
             <Link
               href="/set-password"
