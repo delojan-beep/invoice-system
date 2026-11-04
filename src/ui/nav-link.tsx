@@ -4,10 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-/** Header nav link that marks the current area for sighted and screen-reader users. */
-export function NavLink({ href, children }: { href: string; children: ReactNode }) {
+/**
+ * Nav link that marks where you are for sighted and screen-reader users. It also
+ * stays marked on pages beneath it; `exact` turns that off, for a link whose
+ * address is the start of its neighbours' (/admin next to /admin/users).
+ */
+export function NavLink({ href, exact = false, children }: { href: string; exact?: boolean; children: ReactNode }) {
   const pathname = usePathname();
-  const active = pathname === href || pathname.startsWith(`${href}/`);
+  const active = pathname === href || (!exact && pathname.startsWith(`${href}/`));
 
   return (
     <Link
