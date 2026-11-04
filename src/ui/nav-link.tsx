@@ -17,10 +17,10 @@ export function NavLink({ href, exact = false, children }: { href: string; exact
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`inline-flex min-h-11 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-150 ${
+      className={`inline-flex min-h-11 items-center border-b-2 px-1 text-base font-medium transition-colors duration-150 ${
         active
           ? "border-accent-600 text-brand-800"
-          : "border-transparent text-zinc-700 hover:border-zinc-300 hover:text-zinc-900"
+          : "border-transparent text-ink-700 hover:border-ink-300 hover:text-ink-900"
       }`}
     >
       {children}

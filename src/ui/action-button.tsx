@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useConfirmedSubmit } from "./confirm-dialog";
 import { Btn, Message } from "./controls";
 
 type State = { error?: string; message?: string };
@@ -23,12 +24,13 @@ export function ActionButton({
   variant?: "primary" | "secondary" | "danger" | "link";
 }) {
   const [state, run, pending] = useActionState(action, {});
+  const { guard, dialog } = useConfirmedSubmit();
 
   return (
     <form
       action={run}
       onSubmit={(e) => {
-        if (confirmText && !window.confirm(confirmText)) e.preventDefault();
+        if (confirmText) guard(e, { message: confirmText, confirmLabel: label, danger: variant === "danger" });
       }}
       className="inline-flex flex-col items-start gap-1"
     >
@@ -36,6 +38,7 @@ export function ActionButton({
         {pending ? pendingLabel : label}
       </Btn>
       <Message error={state.error} message={state.message} />
+      {dialog}
     </form>
   );
 }

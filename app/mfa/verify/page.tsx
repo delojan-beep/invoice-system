@@ -18,10 +18,10 @@ export default async function VerifyPage() {
 
   return (
     <AuthCard title="Enter your two-factor code">
-      <p className="text-sm text-zinc-600">Open your authenticator app and enter the 6-digit code for QNetwork Invoices.</p>
+      <p className="text-base text-ink-600">Open your authenticator app and enter the 6-digit code for Invoices.</p>
       <CodeForm factorId={factor.id} submitLabel="Verify" />
       <form action="/auth/signout" method="post">
-        <button type="submit" className="text-sm text-zinc-600 hover:underline">
+        <button type="submit" className="text-base text-ink-600 hover:underline">
           Sign out
         </button>
       </form>

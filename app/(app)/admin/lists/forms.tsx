@@ -12,7 +12,7 @@ type Action = (prev: FormState, formData: FormData) => Promise<FormState>;
 export function AddForm({ action, children, label }: { action: Action; children: ReactNode; label: string }) {
   const [state, run, pending] = useFormAction(action);
   return (
-    <CheckedForm onSubmit={run} className="flex flex-col gap-3 border-t border-zinc-200 pt-4">
+    <CheckedForm onSubmit={run} className="flex flex-col gap-3 border-t border-ink-200 pt-4">
       <div className="grid gap-3 sm:grid-cols-4">{children}</div>
       <div className="flex flex-wrap items-center gap-3">
         <Btn type="submit" variant="secondary" disabled={pending}>
@@ -74,8 +74,8 @@ export function LineTypeFields() {
       <Label text="Name">
         <Input name="name" placeholder="Training" required />
       </Label>
-      <label className="flex items-center gap-2 self-end pb-2 text-sm text-zinc-800">
-        <input type="checkbox" name="receiptRequired" className="h-4 w-4" />
+      <label className="flex min-h-11 cursor-pointer items-center gap-3 self-end text-base text-ink-800">
+        <input type="checkbox" name="receiptRequired" className="size-5" />
         Receipt required
       </label>
     </>

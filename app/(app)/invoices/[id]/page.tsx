@@ -45,26 +45,29 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {isApprover && invoice.status === "submitted" && !invoice.review_started_at && (
         <ReviewStarter start={startReview.bind(null, invoice.id)} />
       )}
 
       <div>
-        <Link href={back} className="text-sm text-brand-700 hover:underline">
+        <Link href={back} className="inline-flex min-h-11 items-center text-base text-brand-700 hover:underline">
           ← {back === "/accounts" ? "All invoices" : "Approvals"}
         </Link>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold text-zinc-900">
-            {invoice.employee?.name} · {formatMonth(invoice.month)}
-          </h1>
-          <StatusBadge status={invoice.status} overdue={isOverdue(invoice)} />
+        <div className="mt-2 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+            <h1 className="text-title font-medium text-ink-900">
+              {invoice.employee?.name} · {formatMonth(invoice.month)}
+            </h1>
+            <StatusBadge status={invoice.status} overdue={isOverdue(invoice)} />
+          </div>
+          <p className="text-amount font-medium text-brand-900">{formatMoney(invoice.total_minor, currency)}</p>
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-          <p className="font-mono text-sm text-zinc-600">{invoice.number}</p>
-          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="inline-flex min-h-11 items-center text-sm font-medium text-brand-700 hover:underline">Download PDF</a>
+          <p className="text-base text-ink-600">{invoice.number}</p>
+          <a href={`/pdf/${invoice.id}`} target="_blank" rel="noopener" className="inline-flex min-h-11 items-center text-base font-medium text-brand-700 hover:underline">Download PDF</a>
         </div>
-        <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-zinc-600">
+        <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-base text-ink-600">
           {invoice.submitted_at && <div>Submitted {formatDate(invoice.submitted_at, tz)}</div>}
           {invoice.status === "submitted" && invoice.review_deadline && (
             <div className={isOverdue(invoice) ? "font-medium text-red-700" : ""}>
@@ -89,7 +92,8 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
         <Card title="Review">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-              <p className="text-sm text-zinc-600">Approving tells the employee; pay it in Wise straight after.</p>
+              <p className="text-base text-ink-600">Opening this invoice started the review, so the employee can no longer recall it.</p>
+              <p className="text-base text-ink-600">Approving tells the employee; pay it in Wise straight after.</p>
               <ActionButton
                 action={approve.bind(null, invoice.id)}
                 label={`Approve ${formatMoney(invoice.total_minor, currency)}`}
@@ -98,7 +102,7 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
                 confirmText={`Approve ${formatMoney(invoice.total_minor, currency)} for ${invoice.employee?.name ?? "this employee"}? They are told straight away.`}
               />
             </div>
-            <div className="border-t border-zinc-200 pt-4">
+            <div className="border-t border-ink-200 pt-4">
               <RejectForm action={reject.bind(null, invoice.id)} />
             </div>
           </div>
@@ -107,7 +111,7 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
 
       {isApprover && invoice.status === "approved" && (
         <Card title="Paid in Wise?">
-          <p className="mb-3 text-sm text-zinc-600">
+          <p className="mb-3 text-base text-ink-600">
             Optional: mark it paid to clear it from your daily summary. The employee can also mark it when the money arrives.
           </p>
           <ActionButton
@@ -123,37 +127,37 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
       {invoice.status === "paid" && (
         <Card title="Payment">
           {payment?.confirmed_by_accounts_at ? (
-            <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+            <dl className="grid gap-x-6 gap-y-2 text-base sm:grid-cols-2">
               <div>
-                <dt className="text-zinc-600">Wise transfer</dt>
-                <dd className="font-mono text-zinc-900">{payment.wise_transfer_id}</dd>
+                <dt className="text-ink-600">Wise transfer</dt>
+                <dd className="font-mono text-ink-900">{payment.wise_transfer_id}</dd>
               </div>
               <div>
-                <dt className="text-zinc-600">Confirmed by accounts</dt>
-                <dd className="text-zinc-900">{formatDate(payment.confirmed_by_accounts_at, tz)}</dd>
+                <dt className="text-ink-600">Confirmed by accounts</dt>
+                <dd className="text-ink-900">{formatDate(payment.confirmed_by_accounts_at, tz)}</dd>
               </div>
               <div>
-                <dt className="text-zinc-600">Sent</dt>
-                <dd className="text-zinc-900">{money(payment.amount_sent_minor, payment.sent_currency)}</dd>
+                <dt className="text-ink-600">Sent</dt>
+                <dd className="text-ink-900">{money(payment.amount_sent_minor, payment.sent_currency)}</dd>
               </div>
               <div>
-                <dt className="text-zinc-600">Wise fee</dt>
-                <dd className="text-zinc-900">
+                <dt className="text-ink-600">Wise fee</dt>
+                <dd className="text-ink-900">
                   {money(payment.wise_fee_minor, payment.sent_currency)} ·{" "}
                   {payment.fee_paid_by === "deducted" ? "deducted from payment" : "company paid"}
                 </dd>
               </div>
               <div>
-                <dt className="text-zinc-600">Received</dt>
-                <dd className="text-zinc-900">{money(payment.amount_received_minor, payment.received_currency)}</dd>
+                <dt className="text-ink-600">Received</dt>
+                <dd className="text-ink-900">{money(payment.amount_received_minor, payment.received_currency)}</dd>
               </div>
               <div>
-                <dt className="text-zinc-600">Actual rate</dt>
-                <dd className="text-zinc-900">{payment.actual_exchange_rate ?? "—"}</dd>
+                <dt className="text-ink-600">Actual rate</dt>
+                <dd className="text-ink-900">{payment.actual_exchange_rate ?? "—"}</dd>
               </div>
             </dl>
           ) : (
-            <p className="text-sm text-zinc-600">
+            <p className="text-base text-ink-600">
               Not yet confirmed against Wise.
               {payment?.amount_received_minor != null &&
                 ` The employee reported receiving ${money(payment.amount_received_minor, payment.received_currency)}.`}
@@ -161,8 +165,8 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
           )}
 
           {isAccounts && (
-            <div className="mt-4 border-t border-zinc-200 pt-4">
-              <h3 className="mb-3 text-sm font-semibold text-zinc-900">
+            <div className="mt-4 border-t border-ink-200 pt-4">
+              <h3 className="mb-3 text-base font-medium text-ink-900">
                 {payment?.confirmed_by_accounts_at ? "Update the Wise details" : "Confirm against Wise"}
               </h3>
               <ConfirmPaymentForm
@@ -188,19 +192,19 @@ export default async function StaffInvoicePage({ params, searchParams }: PagePro
       <Card title="History">
         <ol className="flex flex-col gap-3">
           {[...invoice.events].reverse().map((e) => (
-            <li key={e.id} className="text-sm">
-              <p className="text-zinc-900">
+            <li key={e.id} className="text-base">
+              <p className="text-ink-900">
                 <span className="font-medium">{ACTION_LABELS[e.action] ?? e.action}</span>
-                <span className="text-zinc-600">
+                <span className="text-ink-600">
                   {" "}
                   · {e.actor_id === viewer.id ? "You" : (e.actor?.name ?? "System")}
                 </span>
               </p>
-              {e.comment && <p className="text-zinc-700">“{e.comment}”</p>}
-              {e.system_note && (e.action.startsWith("attachment") || e.action === "payment_confirm") && (
-                <p className="text-zinc-600">{e.system_note}</p>
+              {e.comment && <p className="text-ink-700">“{e.comment}”</p>}
+              {e.system_note && (e.action.startsWith("attachment") || e.action === "payment_confirm" || e.action === "currency_convert") && (
+                <p className="text-ink-600">{e.system_note}</p>
               )}
-              <p className="text-xs text-zinc-600">{formatDateTime(e.created_at, tz)}</p>
+              <p className="text-sm text-ink-600">{formatDateTime(e.created_at, tz)}</p>
             </li>
           ))}
         </ol>

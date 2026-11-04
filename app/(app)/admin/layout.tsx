@@ -14,8 +14,8 @@ const SECTIONS = [
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   await requireAccess(["admin"]);
   return (
-    <div className="flex flex-col gap-6">
-      <nav aria-label="Admin sections" className="flex flex-wrap gap-x-5 gap-y-2 border-b border-zinc-200">
+    <div className="flex flex-col gap-8">
+      <nav aria-label="Admin sections" className="flex flex-wrap gap-x-5 gap-y-2 border-b border-ink-200">
         {SECTIONS.map((s) => (
           <NavLink key={s.href} href={s.href} exact={s.href === "/admin"}>
             {s.label}

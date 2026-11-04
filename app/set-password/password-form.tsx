@@ -25,7 +25,7 @@ export function PasswordForm() {
           autoFocus
           required
         />
-        <p id="password-help" className="text-xs text-zinc-600">
+        <p id="password-help" className="text-sm text-ink-600">
           At least 10 characters, with both letters and numbers.
         </p>
         {state.field === "password" && <Message error={state.error} />}

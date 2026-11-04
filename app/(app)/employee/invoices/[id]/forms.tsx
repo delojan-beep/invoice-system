@@ -2,8 +2,10 @@
 
 import { CheckedForm } from "@/src/ui/checked-form";
 import { useState } from "react";
+import { useConfirmedSubmit } from "@/src/ui/confirm-dialog";
 import { useFormAction } from "@/src/ui/use-form-action";
-import type { CurrencyInfo } from "@/src/domain/money";
+import { lineAmounts } from "@/src/domain/invoice";
+import { convertMinor, formatMoney, type CurrencyInfo } from "@/src/domain/money";
 import { Btn, Input, Label, Message, Select } from "@/src/ui/controls";
 import type { FormState } from "./actions";
 
@@ -16,20 +18,51 @@ export function DetailsForm({
   currency,
   currencies,
   reference,
+  lines,
+  toBase,
+  ratesDate,
 }: {
   action: Action;
   editable: boolean;
   currency: string;
   currencies: CurrencyInfo[];
   reference: string;
+  lines: { quantity: number; rateMinor: number }[];
+  toBase: Record<string, number>;
+  ratesDate: string | null;
 }) {
   const [state, run, pending] = useFormAction(action, {});
+  const [selected, setSelected] = useState(currency);
+  const { guard, dialog } = useConfirmedSubmit();
+
+  // Lines are converted by the database. This previews its result, so it can be a cent out.
+  const current = currencies.find((c) => c.code === currency);
+  const next = currencies.find((c) => c.code === selected);
+  const changing = lines.length > 0 && current && next && selected !== currency;
+  const converted = changing ? lines.map((l) => convertMinor(l.rateMinor, current, next, toBase)) : [];
+  const canConvert = changing && converted.every((rate) => rate !== null);
+  const subtotal = canConvert
+    ? lines.reduce((sum, l, i) => sum + lineAmounts(l.quantity, converted[i]!, null).lineTotalMinor, 0)
+    : 0;
+  const preview = !changing
+    ? null
+    : canConvert
+      ? `Line amounts are converted at 1 ${currency} = ${(toBase[currency] / toBase[selected]).toPrecision(4)} ${selected}${ratesDate ? ` (rates from ${ratesDate})` : ""}, so the subtotal becomes about ${formatMoney(subtotal, next)}. Any tax rates are removed.`
+      : `There's no exchange rate for ${selected} yet, so this invoice can't be converted. Try again tomorrow.`;
+
   return (
-    <CheckedForm onSubmit={run} className="flex flex-col gap-3">
+    <CheckedForm
+      className="flex flex-col gap-3"
+      onSubmit={(e) => {
+        const message = `Change this invoice from ${currency} to ${selected}?\n\n${preview}`;
+        if (canConvert && !guard(e, { message, confirmLabel: `Convert to ${selected}` })) return;
+        run(e);
+      }}
+    >
       <div className="grid gap-3 sm:grid-cols-2">
         {editable && (
-          <Label text="Currency" hint="Changing it removes tax rates set for the old currency">
-            <Select name="currency" defaultValue={currency}>
+          <Label text="Currency" hint={preview ? undefined : "Changing it converts line amounts at the latest exchange rate. Any tax rates are removed."}>
+            <Select name="currency" value={selected} onChange={(e) => setSelected(e.target.value)}>
               {currencies.map((c) => (
                 <option key={c.code} value={c.code}>
                   {c.code}
@@ -42,12 +75,19 @@ export function DetailsForm({
           <Input name="reference" defaultValue={reference} maxLength={200} />
         </Label>
       </div>
+      {preview && (
+        <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-base text-amber-900">
+          {preview}
+          {canConvert && " Check every line before you submit."}
+        </p>
+      )}
       <div className="flex items-center gap-3">
         <Btn type="submit" variant="secondary" disabled={pending}>
           {pending ? "Saving…" : "Save details"}
         </Btn>
         <Message error={state.error} message={state.message} />
       </div>
+      {dialog}
     </CheckedForm>
   );
 }
@@ -64,29 +104,47 @@ export function SubmitForm({
 }) {
   const [state, run, pending] = useFormAction(action, {});
   const [confirmed, setConfirmed] = useState(false);
+  const [problem, setProblem] = useState<string>();
   const blocked = blockers.length > 0;
 
   return (
-    <CheckedForm onSubmit={run} className="flex flex-col gap-3">
+    <CheckedForm
+      className="flex flex-col gap-3"
+      onSubmit={(e) => {
+        // The button stays enabled so it can say what's missing, instead of just not responding.
+        if (blocked || !confirmed) {
+          e.preventDefault();
+          setProblem(blocked ? "Fix the items above before you submit." : "Tick the box to confirm everything is correct.");
+          if (!blocked) e.currentTarget.querySelector<HTMLInputElement>('input[name="confirmed"]')?.focus();
+          return;
+        }
+        setProblem(undefined);
+        run(e);
+      }}
+    >
       {blocked && (
-        <ul className="list-disc pl-5 text-sm text-amber-800">
+        <ul className="list-disc pl-5 text-base text-amber-800">
           {blockers.map((b) => (
             <li key={b}>{b}</li>
           ))}
         </ul>
       )}
-      <label className="flex min-h-11 items-start gap-3 py-2 text-sm text-zinc-800">
+      <label className="flex min-h-11 items-start gap-3 py-2 text-base text-ink-800">
         <input
           type="checkbox"
           name="confirmed"
           className="mt-0.5 size-5 shrink-0"
           checked={confirmed}
-          onChange={(e) => setConfirmed(e.target.checked)}
+          onChange={(e) => {
+            setConfirmed(e.target.checked);
+            setProblem(undefined);
+          }}
         />
         I confirm everything is correct
       </label>
+      <Message error={problem} />
       <div className="flex flex-wrap items-center gap-3">
-        <Btn type="submit" disabled={pending || !confirmed || blocked}>
+        <Btn type="submit" disabled={pending}>
           {pending ? "Submitting…" : resubmit ? "Resubmit invoice" : "Submit invoice"}
         </Btn>
         <Message error={state.error} message={state.message} />
@@ -106,14 +164,13 @@ export function MarkPaidForm({
   currencies: CurrencyInfo[];
 }) {
   const [state, run, pending] = useFormAction(action, {});
+  const { guard, dialog } = useConfirmedSubmit();
   return (
     <CheckedForm
       className="flex flex-col gap-3"
       onSubmit={(e) => {
-        if (!window.confirm("Mark this invoice as paid? Only do this once the money has arrived.")) {
-          e.preventDefault();
-          return;
-        }
+        const message = "Mark this invoice as paid? Only do this once the money has arrived.";
+        if (!guard(e, { message, confirmLabel: "Mark as paid" })) return;
         run(e);
       }}
     >
@@ -137,6 +194,7 @@ export function MarkPaidForm({
         </Btn>
         <Message error={state.error} message={state.message} />
       </div>
+      {dialog}
     </CheckedForm>
   );
 }

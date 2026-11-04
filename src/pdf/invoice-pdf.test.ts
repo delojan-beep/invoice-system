@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { pdfSafe, renderInvoicePdf, wrap, type InvoicePdfData } from "./invoice-pdf";
 
 const data = (lines = 2): InvoicePdfData => ({
-  company: { name: "QNetwork", businessNumber: "123456789RC0001", address: "1 King St W\nToronto ON" },
+  company: { name: "Acme Ltd", businessNumber: "123456789RC0001", address: "1 King St W\nToronto ON" },
   worker: { name: "Nimal Perera", code: "E014", address: "12 Galle Road, Colombo 03", nicOrTin: "199012345678" },
   invoice: { number: "QN-E014-2026-10-001", month: "October 2026", status: "Submitted", submitted: "Oct 28, 2026", currency: "LKR", reference: null },
   lines: Array.from({ length: lines }, (_, i) => ({

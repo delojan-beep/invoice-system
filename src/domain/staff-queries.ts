@@ -68,6 +68,18 @@ export async function getApproverQueue() {
 }
 
 /** Employees for the accounts filter. */
+/** Every month with an invoice staff can see, newest first ("2026-11"). */
+export async function listInvoiceMonths() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("invoices")
+    .select("month")
+    .neq("status", "draft")
+    .order("month", { ascending: false });
+  if (error) throw error;
+  return [...new Set(data.map((i) => i.month.slice(0, 7)))];
+}
+
 export async function listEmployees() {
   const supabase = await createClient();
   const { data, error } = await supabase

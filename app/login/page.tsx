@@ -15,6 +15,7 @@ const ERRORS: Record<string, string> = {
   google: "That Google account can't sign in here. Use the address your admin added, or ask them to add you.",
   "google-failed": "Google sign-in didn't finish. Try again, or sign in with your password or an email link.",
   inactive: "Your account is inactive. Contact the admin if you need access.",
+  unavailable: "Sign-in links can't be sent right now. Try again in a few minutes, or use your password.",
 };
 
 export default async function LoginPage({
@@ -32,16 +33,16 @@ export default async function LoginPage({
       <form action={signInWithGoogle}>
         <GoogleButton />
       </form>
-      <div className="flex items-center gap-3 text-xs text-zinc-600">
-        <span className="h-px flex-1 bg-zinc-200" />
+      <div className="flex items-center gap-3 text-sm text-ink-600">
+        <span className="h-px flex-1 bg-ink-200" />
         or
-        <span className="h-px flex-1 bg-zinc-200" />
+        <span className="h-px flex-1 bg-ink-200" />
       </div>
     </>
   );
 
   return (
-    <AuthCard title="Sign in to QNetwork Invoices">
+    <AuthCard title="Sign in">
       {mode === "password" ? (
         <PasswordForm earlierError={error}>{google}</PasswordForm>
       ) : (
@@ -54,7 +55,7 @@ export default async function LoginPage({
                 If that address belongs to an account, a sign-in link is on its way. It works once and expires in 24
                 hours.
               </Notice>
-              <Link href="/login" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
+              <Link href="/login" className="inline-flex min-h-11 items-center text-base text-brand-700 hover:underline">
                 Back to password sign-in
               </Link>
             </div>
@@ -62,7 +63,7 @@ export default async function LoginPage({
             <CheckedForm action={sendEmailLink} className="flex flex-col gap-4">
               <Field label="Email" name="email" type="email" autoComplete="email" required />
               <Button type="submit">Email me a link</Button>
-              <Link href="/login" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
+              <Link href="/login" className="inline-flex min-h-11 items-center text-base text-brand-700 hover:underline">
                 Sign in with a password instead
               </Link>
             </CheckedForm>

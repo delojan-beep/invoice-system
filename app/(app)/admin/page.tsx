@@ -50,7 +50,7 @@ export default async function AdminPage() {
     {
       ok: Boolean(process.env.FX_PROVIDER),
       label: "Exchange-rate provider",
-      fix: "Choose a provider and set FX_PROVIDER. Until then reports have no CAD value.",
+      fix: "Set FX_PROVIDER=open-er-api in Vercel (ExchangeRate-API, no key needed). Until then reports have no CAD value.",
     },
     {
       ok: Boolean(process.env.GOOGLE_SA_JSON && process.env.BACKUP_SHEET_ID),
@@ -61,20 +61,30 @@ export default async function AdminPage() {
   const done = checks.filter((c) => c.ok).length;
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-zinc-900">Admin</h1>
+    <div className="flex flex-col gap-8">
+      <h1 className="text-title font-medium text-ink-900">Admin</h1>
 
       <Card title={`Ready for launch: ${done} of ${checks.length}`}>
-        <ul className="flex flex-col gap-3">
+        <ul className="flex flex-col gap-1">
           {checks.map((c) => (
-            <li key={c.label} className="flex gap-3 text-sm">
-              <span aria-hidden className={c.ok ? "text-emerald-600" : "text-amber-600"}>
-                {c.ok ? "✓" : "○"}
-              </span>
+            <li key={c.label} className="flex gap-3 text-base">
+              {/* Lucide "check" and "circle". The sr-only text below says which, in words. */}
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`mt-3.5 size-4 shrink-0 ${c.ok ? "text-emerald-600" : "text-accent-600"}`}
+              >
+                {c.ok ? <path d="M20 6 9 17l-5-5" /> : <circle cx="12" cy="12" r="9" />}
+              </svg>
               <div>
-                <p className="font-medium text-zinc-900">
+                <p className="flex min-h-11 flex-wrap items-center font-medium text-ink-900">
                   {c.href && !c.ok ? (
-                    <Link href={c.href} className="hover:underline">
+                    <Link href={c.href} className="inline-flex min-h-11 items-center hover:underline">
                       {c.label}
                     </Link>
                   ) : (
@@ -82,7 +92,7 @@ export default async function AdminPage() {
                   )}
                   <span className="sr-only">{c.ok ? " (done)" : " (to do)"}</span>
                 </p>
-                {!c.ok && c.fix && <p className="text-zinc-600">{c.fix}</p>}
+                {!c.ok && c.fix && <p className="text-ink-600">{c.fix}</p>}
               </div>
             </li>
           ))}
@@ -90,7 +100,7 @@ export default async function AdminPage() {
       </Card>
 
       <Card title="At a glance">
-        <ul className="grid gap-2 text-sm text-zinc-700 sm:grid-cols-2">
+        <ul className="grid gap-2 text-base text-ink-700 sm:grid-cols-2">
           <li>{users.filter((u) => u.status === "active").length} active users ({employees.length} employees)</li>
           <li>{lists.currencies.filter((c) => c.active).map((c) => c.code).join(", ")} in use</li>
           <li>

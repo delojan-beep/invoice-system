@@ -18,7 +18,7 @@ export function PasswordField({ label, ...input }: { label: string } & Omit<Comp
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-sm font-medium text-zinc-700">
+      <label htmlFor={id} className="text-base font-medium text-ink-700">
         {label}
       </label>
       <div className="relative">
@@ -37,7 +37,7 @@ export function PasswordField({ label, ...input }: { label: string } & Omit<Comp
           type="button"
           onClick={() => setVisible(!visible)}
           aria-label={`${visible ? "Hide" : "Show"} ${label.toLowerCase()}`}
-          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-md text-zinc-600 transition-colors duration-150 hover:text-zinc-900"
+          className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center rounded-lg text-ink-600 transition-colors duration-150 hover:text-ink-900"
         >
           <svg
             aria-hidden="true"

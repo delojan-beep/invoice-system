@@ -98,7 +98,7 @@ export async function saveLine(
     .select("id", { count: "exact", head: true })
     .eq("invoice_id", invoiceId);
   const { error } = await supabase.from("line_items").insert({ ...row, invoice_id: invoiceId, position: count ?? 0 });
-  return done(toResult(null, error));
+  return done(toResult(null, error), "Line added");
 }
 
 export async function deleteLine(invoiceId: string, lineId: string): Promise<FormState> {

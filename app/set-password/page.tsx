@@ -11,14 +11,14 @@ export default async function SetPasswordPage() {
 
   return (
     <AuthCard title={viewer.needsPassword ? "Set up your password" : "Change your password"}>
-      <p className="text-sm text-zinc-600">
+      <p className="text-base text-ink-600">
         {viewer.needsPassword
           ? "You're signed in. Choose a password so you can sign in without an email link next time."
           : `Choose a new password for ${viewer.email}.`}
       </p>
       <PasswordForm />
       {!viewer.needsPassword && (
-        <Link href="/" className="inline-flex min-h-11 items-center text-sm text-brand-700 hover:underline">
+        <Link href="/" className="inline-flex min-h-11 items-center text-base text-brand-700 hover:underline">
           Cancel
         </Link>
       )}

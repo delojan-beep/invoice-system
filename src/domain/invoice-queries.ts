@@ -11,7 +11,7 @@ export async function listMyInvoices(employeeId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("invoices")
-    .select(`id, number, month, status, total_minor, submitted_at, review_deadline, review_started_at, ${CURRENCY}`)
+    .select(`id, number, month, status, total_minor, submitted_at, paid_at, review_deadline, review_started_at, ${CURRENCY}`)
     .eq("employee_id", employeeId)
     .order("month", { ascending: false });
   if (error) throw error;
@@ -64,3 +64,21 @@ export async function getFormOptions(currencyCode: string) {
 }
 
 export type FormOptions = Awaited<ReturnType<typeof getFormOptions>>;
+
+/** The latest stored rate of each currency into the base currency, for previewing a conversion. */
+export async function getConversionRates() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("exchange_rates")
+    .select("rate_date, from_currency, to_currency, rate")
+    .order("rate_date", { ascending: false })
+    .limit(200);
+  if (error) throw error;
+
+  const toBase: Record<string, number> = {};
+  for (const r of data) {
+    toBase[r.to_currency] = 1;
+    toBase[r.from_currency] ??= Number(r.rate);
+  }
+  return { toBase, date: data[0]?.rate_date ?? null };
+}

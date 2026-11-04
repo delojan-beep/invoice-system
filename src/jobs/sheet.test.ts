@@ -11,13 +11,13 @@ describe("serviceAccountJwt", () => {
     const { privateKey, publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
     const now = new Date("2026-10-28T10:00:00Z");
     const jwt = serviceAccountJwt(
-      { client_email: "backup@qnetwork.iam.gserviceaccount.com", private_key: privateKey.export({ type: "pkcs8", format: "pem" }).toString() },
+      { client_email: "backup@example.iam.gserviceaccount.com", private_key: privateKey.export({ type: "pkcs8", format: "pem" }).toString() },
       now,
     );
     const [header, payload, signature] = jwt.split(".");
     expect(JSON.parse(Buffer.from(header, "base64url").toString())).toEqual({ alg: "RS256", typ: "JWT" });
     expect(JSON.parse(Buffer.from(payload, "base64url").toString())).toEqual({
-      iss: "backup@qnetwork.iam.gserviceaccount.com",
+      iss: "backup@example.iam.gserviceaccount.com",
       scope: "https://www.googleapis.com/auth/spreadsheets",
       aud: "https://oauth2.googleapis.com/token",
       iat: 1793181600,

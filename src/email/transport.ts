@@ -24,7 +24,7 @@ function transport(): Transport {
 }
 
 function from() {
-  return process.env.EMAIL_FROM || "QNetwork Invoices <invoices@qnetwork.test>";
+  return process.env.EMAIL_FROM || "Invoices <invoices@qnetwork.test>";
 }
 
 /** Returns the provider's message id. Throws if the email was not accepted. */

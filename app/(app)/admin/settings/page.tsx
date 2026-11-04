@@ -17,8 +17,8 @@ export default async function SettingsPage() {
   const company = (s.company ?? {}) as { name?: string; business_number?: string; address?: string };
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-zinc-900">Settings</h1>
+    <div className="flex flex-col gap-8">
+      <h1 className="text-title font-medium text-ink-900">Settings</h1>
       <Card>
         <SettingsForm
           action={saveSettings}
@@ -35,7 +35,7 @@ export default async function SettingsPage() {
             invoiceNumberFormat: str(s.invoice_number_format, "QN-{EMP}-{YYYY}-{MM}-{NNN}"),
             baseCurrency: str(s.base_currency, "CAD"),
             wiseFeePayer: str(s.wise_fee_payer, ""),
-            companyName: company.name ?? "QNetwork",
+            companyName: company.name ?? "",
             companyBn: company.business_number ?? "",
             companyAddress: company.address ?? "",
             wording: (s.email_wording ?? {}) as Record<string, string>,

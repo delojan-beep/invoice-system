@@ -51,29 +51,29 @@ export function UserForm({
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium text-zinc-700">Roles</legend>
+        <legend className="text-base font-medium text-ink-700">Roles</legend>
         <div className="flex flex-wrap gap-4">
           {ROLES.map((r) => (
-            <label key={r} className="flex items-center gap-2 text-sm text-zinc-800">
+            <label key={r} className="flex min-h-11 cursor-pointer items-center gap-3 text-base text-ink-800">
               <input
                 type="checkbox"
                 name="roles"
                 value={r}
                 defaultChecked={initial.roles.includes(r)}
                 onChange={r === "employee" ? (event) => setIsEmployee(event.target.checked) : undefined}
-                className="h-4 w-4"
+                className="size-5"
               />
               {ROLE_LABELS[r]}
             </label>
           ))}
         </div>
-        <p className="text-xs text-zinc-600">Approver, accounts and admin must set up two-factor sign-in.</p>
+        <p className="text-sm text-ink-600">Approver, accounts and admin must set up two-factor sign-in.</p>
       </fieldset>
 
       <div className={`grid gap-3 ${isEmployee ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
         {isEmployee && (
           <Label text="Employee code" hint="Given automatically. Used in their invoice numbers.">
-            <output className="flex min-h-11 items-center rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-base font-normal text-zinc-800 sm:text-sm">
+            <output className="flex min-h-11 items-center rounded-lg border border-ink-200 bg-ink-50 px-3 py-2 text-base font-normal text-ink-800">
               {initial.employeeCode || nextCode}
             </output>
           </Label>
